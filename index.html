@@ -1,0 +1,142 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPU Scheduling Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+    <header class="header">
+        <div>
+            <h1>CPU Scheduling Simulator HAHAHAHAHA</h1>
+            <p>Operating Systems Process Management</p>
+        </div>
+        <span class="status">● Simulator Ready</span>
+    </header>
+
+    <main>
+
+        <section class="panel">
+            <h2>01. Process Input</h2>
+            <p class="description">
+                Add processes and specify their scheduling information.
+            </p>
+
+            <div class="input-grid">
+                <div class="input-group">
+                    <label for="processID">Process ID</label>
+                    <input type="text" id="processID" placeholder="e.g. P1">
+                </div>
+
+                <div class="input-group">
+                    <label for="arrivalTime">Arrival Time</label>
+                    <input type="number" id="arrivalTime" min="0" placeholder="e.g. 0">
+                </div>
+
+                <div class="input-group">
+                    <label for="burstTime">Burst Time</label>
+                    <input type="number" id="burstTime" min="1" placeholder="e.g. 5">
+                </div>
+            </div>
+
+            <button class="primary-button" onclick="addProcess()">
+                + Add Process
+            </button>
+        </section>
+
+        <section class="panel">
+            <h2>02. Process List</h2>
+            <p class="description">
+                Review all processes added to the simulator.
+            </p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Process ID</th>
+                            <th>Arrival Time</th>
+                            <th>Burst Time</th>
+                        </tr>
+                    </thead>
+                    <tbody id="processTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>03. Scheduling Configuration</h2>
+            <p class="description">
+                Choose an algorithm to simulate.
+            </p>
+
+            <div class="input-group">
+                <label for="algorithm">Scheduling Algorithm</label>
+
+                <select id="algorithm">
+                    <option value="fcfs">
+                        First Come, First Served (FCFS)
+                    </option>
+                    <option value="sjf">
+                        Shortest Job First (SJF)
+                    </option>
+                </select>
+            </div>
+
+            <button class="primary-button run-button"
+                    onclick="runSimulation()">
+                Run Simulation →
+            </button>
+        </section>
+
+        <section class="panel">
+            <h2>04. Gantt Chart</h2>
+            <p class="description">
+                Visual representation of CPU process execution.
+            </p>
+
+            <div id="ganttChart" class="gantt-chart"></div>
+        </section>
+
+        <section class="panel">
+            <h2>05. Scheduling Results</h2>
+            <p class="description">
+                View the calculated scheduling times for each process.
+            </p>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Process</th>
+                            <th>Arrival</th>
+                            <th>Burst</th>
+                            <th>Completion</th>
+                            <th>Turnaround</th>
+                            <th>Waiting</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTable"></tbody>
+                </table>
+            </div>
+
+            <div id="averages" class="average-results"></div>
+        </section>
+
+    </main>
+
+    <footer>
+        CPU Scheduling Simulator | Operating Systems Project
+    </footer>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
