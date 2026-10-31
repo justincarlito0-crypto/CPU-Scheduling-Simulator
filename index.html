@@ -14,8 +14,8 @@
     <header class="topbar">
         <div class="brand">
             <div class="brand-logo">
-    <img src="logo.png" alt="LOGO Logo">
-</div>
+                <img src="logo.png" alt="Project Logo">
+            </div>
             <div>
                 <h2>PLACEHOLDERZZ</h2>
                 <span>PROCESS SCHEDULING TOOL</span>
@@ -257,25 +257,6 @@
 </div>
 
 <script src="script.js"></script>
-
-<script>
-    function toggleTheme() {
-        document.body.classList.toggle("dark-mode");
-
-        const isDark = document.body.classList.contains("dark-mode");
-        const button = document.getElementById("themeToggle");
-
-        button.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
-
-        localStorage.setItem("cpuTheme", isDark ? "dark" : "light");
-    }
-
-    // Load saved theme
-    if (localStorage.getItem("cpuTheme") === "dark") {
-        document.body.classList.add("dark-mode");
-        document.getElementById("themeToggle").textContent = "☀️ Light Mode";
-    }
-</script>
 
 </body>
 </html>

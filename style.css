@@ -1,7 +1,5 @@
 
-/* =========================
-   THEME COLORS
-========================= */
+/* THEME COLORS */
 
 :root {
     --page-bg: #f5f1f7;
@@ -32,14 +30,9 @@
     --shadow: 0 5px 18px rgba(80, 58, 87, 0.06);
 
     --chart-bg: #f7f2f8;
-    --chart-one: #d9c9e4;
-    --chart-two: #e8d2dc;
-    --chart-three: #d5e3da;
     --chart-text: #5e4c68;
     --chart-idle: #ebe7ed;
 }
-
-/* DARK MODE COLORS */
 
 body.dark-mode {
     --page-bg: #191622;
@@ -70,17 +63,11 @@ body.dark-mode {
     --shadow: 0 5px 18px rgba(0, 0, 0, 0.16);
 
     --chart-bg: #302a3a;
-    --chart-one: #655576;
-    --chart-two: #755366;
-    --chart-three: #4d6658;
     --chart-text: #f3eaf6;
     --chart-idle: #46404d;
 }
 
-
-/* =========================
-   GENERAL
-========================= */
+/* GENERAL */
 
 * {
     box-sizing: border-box;
@@ -122,10 +109,7 @@ td,
         border-color 0.25s ease;
 }
 
-
-/* =========================
-   HEADER
-========================= */
+/* HEADER */
 
 .topbar {
     display: flex;
@@ -153,6 +137,13 @@ td,
     border-radius: 13px;
     font-size: 22px;
     font-weight: bold;
+    overflow: hidden;
+}
+
+.brand-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
 .brand h2 {
@@ -226,10 +217,7 @@ td,
     background: var(--purple-soft);
 }
 
-
-/* =========================
-   WELCOME SECTION
-========================= */
+/* WELCOME SECTION */
 
 .welcome-section {
     position: relative;
@@ -340,10 +328,7 @@ td,
     letter-spacing: 1px;
 }
 
-
-/* =========================
-   SECTION HEADINGS
-========================= */
+/* SECTION HEADINGS */
 
 .workspace-section {
     margin-bottom: 48px;
@@ -382,10 +367,7 @@ td,
     font-weight: bold;
 }
 
-
-/* =========================
-   CARDS
-========================= */
+/* CARDS */
 
 .card {
     background: var(--surface);
@@ -435,10 +417,7 @@ td,
     color: var(--purple);
 }
 
-
-/* =========================
-   PROCESS LAYOUT
-========================= */
+/* PROCESS LAYOUT */
 
 .process-layout {
     display: grid;
@@ -452,10 +431,7 @@ td,
     min-width: 0;
 }
 
-
-/* =========================
-   INPUTS
-========================= */
+/* INPUTS */
 
 .input-group {
     display: flex;
@@ -498,10 +474,7 @@ select option {
     color: var(--text-main);
 }
 
-
-/* =========================
-   BUTTONS
-========================= */
+/* BUTTONS */
 
 button {
     border: none;
@@ -530,10 +503,7 @@ button {
     transform: translateY(-1px);
 }
 
-
-/* =========================
-   TABLES
-========================= */
+/* TABLES */
 
 .table-container {
     width: 100%;
@@ -579,10 +549,7 @@ tbody tr:hover {
     margin-right: 5px;
 }
 
-
-/* =========================
-   SCHEDULING
-========================= */
+/* SCHEDULING */
 
 .scheduling-card {
     display: grid;
@@ -643,10 +610,7 @@ tbody tr:hover {
     transform: translateY(-1px);
 }
 
-
-/* =========================
-   GANTT CHART
-========================= */
+/* GANTT CHART */
 
 .gantt-chart {
     display: flex;
@@ -675,17 +639,9 @@ tbody tr:hover {
     text-align: center;
     color: var(--chart-text) !important;
     font-weight: bold;
-    background: var(--chart-one);
+    background: var(--chart-bg);
     animation: ganttAppear 0.55s ease both;
     transition: transform 0.2s ease, filter 0.2s ease;
-}
-
-.gantt-block:nth-child(3n + 2) {
-    background: var(--chart-two);
-}
-
-.gantt-block:nth-child(3n) {
-    background: var(--chart-three);
 }
 
 .gantt-block:hover {
@@ -721,10 +677,7 @@ tbody tr:hover {
     margin-right: 6px;
 }
 
-
-/* =========================
-   RESULTS
-========================= */
+/* RESULTS */
 
 .results-card {
     overflow: hidden;
@@ -776,10 +729,7 @@ tbody tr:hover {
     color: var(--green-text);
 }
 
-
-/* =========================
-   STATISTICS
-========================= */
+/* STATISTICS */
 
 .average-results,
 .stats-grid {
@@ -830,10 +780,7 @@ tbody tr:hover {
     color: var(--text-muted);
 }
 
-
-/* =========================
-   FOOTER
-========================= */
+/* FOOTER */
 
 footer {
     text-align: center;
@@ -859,10 +806,7 @@ footer span {
     font-size: 11px;
 }
 
-
-/* =========================
-   ANIMATIONS
-========================= */
+/* ANIMATIONS */
 
 @keyframes rowAppear {
     from {
@@ -888,10 +832,7 @@ footer span {
     }
 }
 
-
-/* =========================
-   RESPONSIVE
-========================= */
+/* RESPONSIVE */
 
 @media (max-width: 950px) {
     .app-container {
@@ -976,32 +917,4 @@ footer span {
     .section-mark {
         font-size: 22px;
     }
-}
-.brand-logo {
-    width: 42px;
-    height: 42px;
-    border-radius: 13px;
-    overflow: hidden;
-}
-
-.brand-logo img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-/* Dark mode Gantt chart */
-body.dark-mode .gantt-block {
-    background: #514568;
-    color: #eee8f5;
-    border: 1px solid #695a80;
-}
-
-body.dark-mode .gantt-block:nth-child(2n) {
-    background: #59465d;
-}
-
-body.dark-mode .gantt-block.idle {
-    background: #292632;
-    color: #aaa2b5;
-    border: 1px dashed #514b5c;
 }
