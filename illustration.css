@@ -1,0 +1,379 @@
+/* =========================================
+   HOME PAGE PROCESSOR ILLUSTRATION
+========================================= */
+
+.welcome-decoration {
+    position: absolute;
+    top: 50%;
+    right: 5%;
+    transform: translateY(-50%);
+
+    width: 290px;
+    height: 290px;
+
+    display: grid;
+    place-items: center;
+
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+
+    pointer-events: none;
+    opacity: 1;
+}
+
+/* BACKGROUND DISC */
+
+.hero-art-background {
+    position: absolute;
+
+    width: 215px;
+    height: 215px;
+
+    border-radius: 50%;
+    background: #f0e7f9;
+    border: 1px solid #dfccec;
+
+    box-shadow: 0 15px 35px rgba(117, 64, 197, .08);
+}
+
+body[data-theme="dark"] .hero-art-background {
+    background: #30233f;
+    border-color: #59426e;
+}
+
+
+/* ORBIT DETAILS */
+
+.hero-orbit {
+    position: absolute;
+    width: 255px;
+    height: 105px;
+    border: 1px solid;
+    border-radius: 50%;
+}
+
+.hero-orbit-one {
+    border-color: rgba(117, 64, 197, .55);
+    transform: rotate(-32deg);
+}
+
+.hero-orbit-two {
+    width: 225px;
+    height: 145px;
+    border-color: rgba(223, 85, 152, .55);
+    transform: rotate(38deg);
+}
+
+
+/* PROCESSOR CARD */
+
+.hero-chip-card {
+    position: relative;
+    z-index: 2;
+
+    width: 155px;
+    height: 155px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1px solid #dfc9ef;
+    border-radius: 25px;
+
+    background: #fffafd;
+
+    box-shadow:
+        0 15px 35px rgba(117, 64, 197, .13),
+        0 5px 14px rgba(223, 85, 152, .08);
+
+    transform: rotate(-4deg);
+
+    animation: heroChipFloat 4s ease-in-out infinite;
+}
+
+body[data-theme="dark"] .hero-chip-card {
+    background: #382844;
+    border-color: #76518f;
+
+    box-shadow:
+        0 15px 35px rgba(0, 0, 0, .25),
+        0 0 18px rgba(173, 128, 237, .1);
+}
+
+.hero-chip-svg {
+    display: block;
+    width: 125px;
+    height: 125px;
+}
+
+
+/* SMALL PROCESS LABELS */
+
+.hero-process-label {
+    position: absolute;
+    z-index: 3;
+
+    padding: 7px 13px;
+
+    border-radius: 7px;
+    border: 1px solid;
+
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+
+    box-shadow: 0 5px 15px rgba(72, 39, 105, .08);
+}
+
+.hero-process-one {
+    top: 45px;
+    left: 17px;
+
+    color: #6840ad;
+    background: #eee2fa;
+    border-color: #d8c0ed;
+}
+
+.hero-process-two {
+    top: 55px;
+    right: 8px;
+
+    color: #b93678;
+    background: #fbe3ef;
+    border-color: #f0c3dc;
+}
+
+.hero-process-three {
+    bottom: 46px;
+    right: 16px;
+
+    color: #6840ad;
+    background: #eee2fa;
+    border-color: #d8c0ed;
+}
+
+body[data-theme="dark"] .hero-process-one,
+body[data-theme="dark"] .hero-process-three {
+    color: #e1c8ff;
+    background: #49345f;
+    border-color: #674a80;
+}
+
+body[data-theme="dark"] .hero-process-two {
+    color: #ffc1df;
+    background: #563048;
+    border-color: #79405f;
+}
+
+
+/* SMALL DOTS */
+
+.hero-decoration-dot {
+    position: absolute;
+    z-index: 2;
+
+    width: 9px;
+    height: 9px;
+
+    border-radius: 50%;
+}
+
+.dot-one {
+    top: 33px;
+    right: 69px;
+    background: #df5598;
+}
+
+.dot-two {
+    bottom: 57px;
+    left: 37px;
+    background: #7540c5;
+}
+
+.dot-three {
+    top: 116px;
+    right: 1px;
+    width: 6px;
+    height: 6px;
+    background: #df5598;
+}
+
+
+/* CAPTION */
+
+.hero-caption {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: max-content;
+
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    color: var(--purple);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.hero-caption-line {
+    width: 18px;
+    height: 1px;
+    background: var(--pink);
+}
+
+
+/* =========================================
+   LOADING SCREEN PROCESSOR LOGO
+========================================= */
+
+.loading-core {
+    width: 105px;
+    height: 105px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+
+    border: 2px solid var(--pink);
+    border-radius: 23px;
+
+    background: var(--purple);
+
+    box-shadow:
+        0 12px 35px rgba(117, 64, 197, .3),
+        0 0 20px rgba(223, 85, 152, .12);
+
+    animation: loadingCpuFloat 2s ease-in-out infinite;
+}
+
+/* SVG LOGO */
+
+.loading-chip-svg {
+    width: 55px;
+    height: 55px;
+    display: block;
+}
+
+.loading-core .loading-core-label {
+    display: block;
+
+    color: white;
+
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+/* MATCH THE ORBITS TO THE MAIN PALETTE */
+
+.orbit-a {
+    border-top-color: var(--pink);
+    border-bottom-color: var(--purple);
+}
+
+.orbit-b {
+    border-top-color: var(--purple);
+    border-right-color: var(--pink);
+}
+
+/* PROGRESS BAR */
+
+.loading-progress-bar {
+    background: linear-gradient(
+        90deg,
+        var(--purple),
+        var(--pink),
+        var(--purple)
+    );
+}
+
+.loading-status {
+    color: var(--pink-dark);
+}
+
+
+/* =========================================
+   ANIMATION
+========================================= */
+
+@keyframes heroChipFloat {
+    0%, 100% {
+        transform: translateY(0) rotate(-4deg);
+    }
+
+    50% {
+        transform: translateY(-7px) rotate(-2deg);
+    }
+}
+
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 800px) {
+    .welcome-decoration {
+        right: -5px;
+        width: 230px;
+        height: 230px;
+        opacity: .55;
+    }
+
+    .hero-art-background {
+        width: 180px;
+        height: 180px;
+    }
+
+    .hero-chip-card {
+        width: 125px;
+        height: 125px;
+    }
+
+    .hero-chip-svg {
+        width: 103px;
+        height: 103px;
+    }
+
+    .hero-orbit-one {
+        width: 220px;
+        height: 90px;
+    }
+
+    .hero-orbit-two {
+        width: 195px;
+        height: 120px;
+    }
+
+    .hero-caption {
+        font-size: 8px;
+    }
+
+    .hero-process-label {
+        padding: 5px 9px;
+        font-size: 9px;
+    }
+}
+
+@media (max-width: 550px) {
+    .welcome-decoration {
+        display: none;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-chip-card,
+    .loading-core {
+        animation: none !important;
+    }
+}

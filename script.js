@@ -1,121 +1,128 @@
+// CPU SCHEDULING SIMULATOR
 
 let SamyangProcesses = JSON.parse(localStorage.getItem("cpuLabProcesses")) || [];
 let SamyangSchedule = [];
 let SamyangResults = [];
 
-let SamyangAlgorithm =
+const SamyangAlgorithm =
     new URLSearchParams(window.location.search).get("algorithm") || "fcfs";
 
-const SamyangAlgorithms = {
-    fcfs: {
-        name: "First Come, First Served",
-        shortName: "FCFS",
-        description: "Processes are executed in the order they arrive in the ready queue."
-    },
-
-    sjf: {
-        name: "Shortest Job First",
-        shortName: "SJF",
-        description: "The available process with the shortest burst time is executed first."
-    },
-
-    priority: {
-        name: "Priority Scheduling",
-        shortName: "PRIORITY",
-        description: "The available process with the highest priority is executed first."
-    }
+const SamyangAlgorithmNames = {
+    fcfs: "First Come, First Served (FCFS)",
+    sjf: "Shortest Job First (SJF)",
+    priority: "Priority Scheduling"
 };
 
 
-// SAVE PROCESSES
+// THEME
 
-function SamyangSaveProcesses() {
-    localStorage.setItem("cpuLabProcesses", JSON.stringify(SamyangProcesses));
+function SamyangSetupTheme() {
+    const isDark = localStorage.getItem("cpuTheme") === "dark";
+
+    document.body.dataset.theme = isDark ? "dark" : "light";
+    SamyangUpdateThemeButton();
+
+    const button = document.getElementById("themeToggle");
+
+    if (button) {
+        button.onclick = SamyangToggleTheme;
+    }
 }
+
+function SamyangToggleTheme() {
+    const isDark = document.body.dataset.theme !== "dark";
+
+    document.body.dataset.theme = isDark ? "dark" : "light";
+    localStorage.setItem("cpuTheme", isDark ? "dark" : "light");
+
+    SamyangUpdateThemeButton();
+}
+
+function SamyangUpdateThemeButton() {
+    const button = document.getElementById("themeToggle");
+
+    if (!button) return;
+
+    button.textContent =
+        document.body.dataset.theme === "dark" ? "☀" : "☾";
+}
+
+window.toggleTheme = SamyangToggleTheme;
 
 
 // LOADING SCREEN
 
 function SamyangShowLoading(message, callback) {
     const overlay = document.getElementById("loadingOverlay");
-    const loadingText = document.getElementById("loadingText");
-
-    if (loadingText) {
-        loadingText.textContent = message;
-    }
 
     if (!overlay) {
         if (callback) callback();
         return;
     }
 
+    const loadingText = document.getElementById("loadingText");
+
+    if (loadingText) {
+        loadingText.textContent = message;
+    }
+
     overlay.classList.remove("hidden");
 
-    // MAKE SURE THE BROWSER DISPLAYS THE LOADING SCREEN FIRST
-    overlay.style.display = "flex";
-
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            setTimeout(() => {
-                if (callback) {
-                    callback();
-                }
-            }, 1500);
-        });
-    });
+    setTimeout(() => {
+        if (callback) callback();
+    }, 900);
 }
 
+function SamyangHideLoading() {
+    const overlay = document.getElementById("loadingOverlay");
 
-// THEME
-
-function SamyangSetupTheme() {
-    const themeButton = document.getElementById("themeToggle");
-
-    if (!themeButton) return;
-
-    const savedTheme = localStorage.getItem("cpuTheme") || "light";
-
-    document.documentElement.setAttribute("data-theme", savedTheme);
-    themeButton.textContent = savedTheme === "dark" ? "☀" : "☾";
-
-    themeButton.addEventListener("click", () => {
-        const currentTheme = document.documentElement.getAttribute("data-theme");
-        const newTheme = currentTheme === "dark" ? "light" : "dark";
-
-        document.documentElement.setAttribute("data-theme", newTheme);
-        localStorage.setItem("cpuTheme", newTheme);
-
-        themeButton.textContent = newTheme === "dark" ? "☀" : "☾";
-    });
+    if (overlay) {
+        overlay.classList.add("hidden");
+    }
 }
 
 
 // HOME PAGE
 
-function SamyangSetupHome() {
+function SamyangSetupHomePage() {
     const welcomeScreen = document.getElementById("welcomeScreen");
     const algorithmSelection = document.getElementById("algorithmSelection");
-    const getStartedButton = document.getElementById("getStartedButton");
-    const backButton = document.getElementById("backToWelcomeButton");
 
     if (!welcomeScreen || !algorithmSelection) return;
 
+    const getStartedButton = document.getElementById("getStartedButton");
+    const backButton = document.getElementById("backToWelcomeButton");
+    const algorithmCards = document.querySelectorAll(".algorithm-card");
+
+    // OPEN ALGORITHM SELECTION DIRECTLY WHEN RETURNING FROM RESULTS
+
+    const parameters = new URLSearchParams(window.location.search);
+    const openSelection = parameters.get("select") === "1";
+
+    if (openSelection) {
+        welcomeScreen.classList.add("hidden");
+        algorithmSelection.classList.remove("hidden");
+    }
+
     if (getStartedButton) {
-        getStartedButton.addEventListener("click", () => {
-            welcomeScreen.classList.add("hidden");
-            algorithmSelection.classList.remove("hidden");
-        });
+        getStartedButton.onclick = () => {
+            SamyangShowLoading("Preparing simulation options...", () => {
+                welcomeScreen.classList.add("hidden");
+                algorithmSelection.classList.remove("hidden");
+                SamyangHideLoading();
+            });
+        };
     }
 
     if (backButton) {
-        backButton.addEventListener("click", () => {
+        backButton.onclick = () => {
             algorithmSelection.classList.add("hidden");
             welcomeScreen.classList.remove("hidden");
-        });
+        };
     }
 
-    document.querySelectorAll(".algorithm-card").forEach(card => {
-        card.addEventListener("click", event => {
+    algorithmCards.forEach(card => {
+        card.onclick = event => {
             event.preventDefault();
 
             const destination = card.getAttribute("href");
@@ -123,203 +130,389 @@ function SamyangSetupHome() {
             SamyangShowLoading("Opening simulator...", () => {
                 window.location.href = destination;
             });
-        });
+        };
     });
 }
 
 
-// SIMULATOR PAGE
+// PROCESS STORAGE
 
-function SamyangSetupSimulator() {
-    const algorithm = SamyangAlgorithms[SamyangAlgorithm] || SamyangAlgorithms.fcfs;
+function SamyangSaveProcesses() {
+    localStorage.setItem(
+        "cpuLabProcesses",
+        JSON.stringify(SamyangProcesses)
+    );
+}
 
-    document.getElementById("algorithmTitle").textContent = algorithm.name;
-    document.getElementById("algorithmDescription").textContent = algorithm.description;
-    document.getElementById("selectedAlgorithm").textContent = algorithm.shortName;
 
-    const priorityGroup = document.getElementById("priorityGroup");
+// THEMED MESSAGE POPUP
 
-    if (SamyangAlgorithm === "priority") {
-        priorityGroup.classList.remove("hidden");
-    } else {
-        priorityGroup.classList.add("hidden");
+function SamyangCreateMessagePopup() {
+    if (document.getElementById("messagePopup")) return;
+
+    const popup = document.createElement("div");
+
+    popup.id = "messagePopup";
+    popup.className = "message-overlay hidden";
+
+    popup.innerHTML = `
+        <div class="message-modal"
+             role="alertdialog"
+             aria-modal="true"
+             aria-labelledby="messagePopupTitle"
+             aria-describedby="messagePopupText">
+
+            <div class="message-icon">!</div>
+
+            <h2 id="messagePopupTitle">Notice</h2>
+
+            <p id="messagePopupText"></p>
+
+            <button type="button"
+                id="messagePopupCloseButton"
+                class="message-button">
+                Okay
+            </button>
+
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    document.getElementById("messagePopupCloseButton").onclick =
+        SamyangCloseMessagePopup;
+
+    popup.onclick = event => {
+        if (event.target === popup) {
+            SamyangCloseMessagePopup();
+        }
+    };
+}
+
+function SamyangShowMessage(title, message) {
+    let popup = document.getElementById("messagePopup");
+
+    if (!popup) {
+        SamyangCreateMessagePopup();
+        popup = document.getElementById("messagePopup");
     }
 
-    document.getElementById("addProcessButton").addEventListener("click", SamyangAddProcess);
-    document.getElementById("clearProcessesButton").addEventListener("click", SamyangClearProcesses);
-    document.getElementById("runSimulationButton").addEventListener("click", SamyangRunSimulation);
-    document.getElementById("editProcessesButton").addEventListener("click", SamyangBackToSimulator);
-    document.getElementById("runAgainButton").addEventListener("click", SamyangBackToSimulator);
+    if (!popup) return;
 
-    ["processID", "arrivalTime", "burstTime", "priority"].forEach(id => {
-        const input = document.getElementById(id);
+    document.getElementById("messagePopupTitle").textContent = title;
+    document.getElementById("messagePopupText").textContent = message;
 
-        if (input) {
-            input.addEventListener("keydown", event => {
-                if (event.key === "Enter") {
-                    SamyangAddProcess();
-                }
-            });
-        }
-    });
+    popup.classList.remove("hidden");
 
-    SamyangRenderProcessTable();
+    document.getElementById("messagePopupCloseButton").focus();
+}
+
+function SamyangCloseMessagePopup() {
+    const popup = document.getElementById("messagePopup");
+
+    if (popup) {
+        popup.classList.add("hidden");
+    }
 }
 
 
 // ADD PROCESS
 
 function SamyangAddProcess() {
-    const id = document.getElementById("processID").value.trim();
-    const arrival = document.getElementById("arrivalTime").value;
-    const burst = document.getElementById("burstTime").value;
-    const priorityInput = document.getElementById("priority").value;
+    const idInput = document.getElementById("processID");
+    const arrivalInput = document.getElementById("arrivalTime");
+    const burstInput = document.getElementById("burstTime");
+    const priorityInput = document.getElementById("priority");
 
-    if (!id || arrival === "" || burst === "") {
-        alert("Please fill in the Process ID, Arrival Time, and Burst Time.");
+    if (!idInput || !arrivalInput || !burstInput) {
+        console.error("Process input fields could not be found.");
         return;
     }
 
-    if (Number(arrival) < 0 || !Number.isInteger(Number(arrival))) {
-        alert("Arrival Time must be a non-negative whole number.");
-        return;
-    }
+    const id = idInput.value.trim();
+    const arrivalText = arrivalInput.value.trim();
+    const burstText = burstInput.value.trim();
 
-    if (Number(burst) <= 0 || !Number.isInteger(Number(burst))) {
-        alert("Burst Time must be a positive whole number.");
-        return;
-    }
+    const arrival = Number(arrivalText);
+    const burst = Number(burstText);
 
-    if (SamyangProcesses.some(process => process.id.toLowerCase() === id.toLowerCase())) {
-        alert("That Process ID already exists.");
-        return;
-    }
+    let priority = 0;
 
-    let priority = null;
+    // CHECK PRIORITY FIRST
 
-    if (SamyangAlgorithm === "priority") {
-        if (priorityInput === "" || Number(priorityInput) < 1 ||
-            !Number.isInteger(Number(priorityInput))) {
-            alert("Please enter a valid priority number.");
+    if (priorityInput && SamyangAlgorithm === "priority") {
+        const priorityText = priorityInput.value.trim();
+
+        if (priorityText === "") {
+            SamyangShowMessage(
+                "Priority Required",
+                "Please enter a priority value."
+            );
+
+            priorityInput.focus();
             return;
         }
 
-        priority = Number(priorityInput);
+        priority = Number(priorityText);
+
+        if (!Number.isFinite(priority)) {
+            SamyangShowMessage(
+                "Invalid Priority",
+                "Please enter a valid priority number."
+            );
+
+            priorityInput.focus();
+            return;
+        }
     }
 
-    SamyangProcesses.push({
+    // CHECK REQUIRED FIELDS
+
+    if (id === "" || arrivalText === "" || burstText === "") {
+        SamyangShowMessage(
+            "Missing Information",
+            "Please complete the required fields."
+        );
+
+        if (id === "") {
+            idInput.focus();
+        } else if (arrivalText === "") {
+            arrivalInput.focus();
+        } else {
+            burstInput.focus();
+        }
+
+        return;
+    }
+
+    // CHECK NUMERIC VALUES
+
+    if (
+        !Number.isFinite(arrival) ||
+        !Number.isFinite(burst) ||
+        arrival < 0 ||
+        burst <= 0
+    ) {
+        SamyangShowMessage(
+            "Invalid Process Values",
+            "Arrival time must be 0 or higher, and burst time must be greater than 0."
+        );
+
+        return;
+    }
+
+    // CHECK DUPLICATE PROCESS ID
+
+    const duplicate = SamyangProcesses.some(process =>
+        process.id.toLowerCase() === id.toLowerCase()
+    );
+
+    if (duplicate) {
+        SamyangShowMessage(
+            "Duplicate Process ID",
+            "That Process ID already exists."
+        );
+
+        idInput.focus();
+        return;
+    }
+
+    // ADD NEW PROCESS
+
+    const newProcess = {
         id: id,
-        arrival: Number(arrival),
-        burst: Number(burst),
+        arrival: arrival,
+        burst: burst,
         priority: priority,
         order: SamyangProcesses.length
-    });
+    };
+
+    SamyangProcesses.push(newProcess);
 
     SamyangSaveProcesses();
-
-    document.getElementById("processID").value = "";
-    document.getElementById("arrivalTime").value = "";
-    document.getElementById("burstTime").value = "";
-    document.getElementById("priority").value = "";
-
     SamyangRenderProcessTable();
+
+    idInput.value = "";
+    arrivalInput.value = "";
+    burstInput.value = "";
+
+    if (priorityInput) {
+        priorityInput.value = "";
+    }
+
+    idInput.focus();
 }
+
+window.addProcess = SamyangAddProcess;
 
 
 // REMOVE PROCESS
 
 function SamyangRemoveProcess(index) {
-    if (!confirm("Remove this process?")) return;
+    if (index < 0 || index >= SamyangProcesses.length) return;
 
     SamyangProcesses.splice(index, 1);
 
-    SamyangSaveProcesses();
-    SamyangRenderProcessTable();
-}
-
-
-// SET PRIORITY
-
-function SamyangSetPriority(index) {
-    const current = SamyangProcesses[index].priority ?? "";
-
-    const answer = prompt("Enter priority number (smaller number = higher priority):", current);
-
-    if (answer === null) return;
-
-    if (answer.trim() === "" || Number(answer) < 1 ||
-        !Number.isInteger(Number(answer))) {
-        alert("Please enter a valid positive whole number.");
-        return;
-    }
-
-    SamyangProcesses[index].priority = Number(answer);
+    SamyangProcesses.forEach((process, i) => {
+        process.order = i;
+    });
 
     SamyangSaveProcesses();
     SamyangRenderProcessTable();
 }
 
+window.SamyangRemoveProcess = SamyangRemoveProcess;
 
-// CLEAR PROCESSES
 
-function SamyangClearProcesses() {
+// CLEAR ALL POPUP
+
+function SamyangCreateClearPopup() {
+    if (document.getElementById("clearConfirmPopup")) return;
+
+    const popup = document.createElement("div");
+
+    popup.id = "clearConfirmPopup";
+    popup.className = "confirm-overlay hidden";
+
+    popup.innerHTML = `
+        <div class="confirm-modal"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="confirmTitle">
+
+            <div class="confirm-icon">!</div>
+
+            <h2 id="confirmTitle">Clear all processes?</h2>
+
+            <p>
+                This will remove all processes from your queue.
+                This action cannot be undone.
+            </p>
+
+            <div class="confirm-actions">
+
+                <button type="button"
+                    id="cancelClearButton"
+                    class="confirm-button">
+                    Cancel
+                </button>
+
+                <button type="button"
+                    id="confirmClearButton"
+                    class="confirm-button confirm-danger">
+                    Clear All
+                </button>
+
+            </div>
+
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    document.getElementById("cancelClearButton").onclick =
+        SamyangCloseClearPopup;
+
+    document.getElementById("confirmClearButton").onclick =
+        SamyangConfirmClearProcesses;
+
+    popup.onclick = event => {
+        if (event.target === popup) {
+            SamyangCloseClearPopup();
+        }
+    };
+}
+
+function SamyangOpenClearPopup() {
     if (SamyangProcesses.length === 0) return;
 
-    if (!confirm("Are you sure you want to clear all processes?")) return;
+    const popup = document.getElementById("clearConfirmPopup");
 
+    if (!popup) return;
+
+    popup.classList.remove("hidden");
+
+    document.getElementById("cancelClearButton").focus();
+}
+
+function SamyangCloseClearPopup() {
+    const popup = document.getElementById("clearConfirmPopup");
+
+    if (popup) {
+        popup.classList.add("hidden");
+    }
+}
+
+function SamyangConfirmClearProcesses() {
     SamyangProcesses = [];
 
     SamyangSaveProcesses();
     SamyangRenderProcessTable();
+
+    SamyangCloseClearPopup();
+}
+
+function SamyangClearProcesses() {
+    SamyangOpenClearPopup();
 }
 
 
-// RENDER PROCESS TABLE
+// HTML PROTECTION
+
+function SamyangEscapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+    })[character]);
+}
+
+
+// PROCESS TABLE
 
 function SamyangRenderProcessTable() {
     const tableBody = document.getElementById("processTableBody");
-    const count = document.getElementById("processCount");
     const emptyMessage = document.getElementById("emptyProcessMessage");
+    const processCount = document.getElementById("processCount");
 
     if (!tableBody) return;
 
     tableBody.innerHTML = "";
 
-    const priorityColumns = document.querySelectorAll(".priority-column");
+    const isPriority = SamyangAlgorithm === "priority";
 
-    priorityColumns.forEach(column => {
-        column.classList.toggle("hidden", SamyangAlgorithm !== "priority");
+    if (processCount) {
+        processCount.textContent =
+            SamyangProcesses.length +
+            (SamyangProcesses.length === 1 ? " process" : " processes");
+    }
+
+    if (emptyMessage) {
+        emptyMessage.classList.toggle(
+            "hidden",
+            SamyangProcesses.length > 0
+        );
+    }
+
+    document.querySelectorAll(".priority-column").forEach(header => {
+        header.classList.toggle("hidden", !isPriority);
     });
-
-    count.textContent = `${SamyangProcesses.length} process${SamyangProcesses.length === 1 ? "" : "es"}`;
-
-    emptyMessage.classList.toggle("hidden", SamyangProcesses.length > 0);
 
     SamyangProcesses.forEach((process, index) => {
         const row = document.createElement("tr");
 
-        let priorityCell = "";
-
-        if (SamyangAlgorithm === "priority") {
-            const priorityText = process.priority ?? "Set";
-
-            priorityCell = `
-                <td>
-                    <button class="table-action priority-button"
-                        onclick="SamyangSetPriority(${index})">
-                        ${priorityText}
-                    </button>
-                </td>
-            `;
-        }
-
         row.innerHTML = `
-            <td><strong>${SamyangEscapeHTML(process.id)}</strong></td>
+            <td>${SamyangEscapeHTML(process.id)}</td>
             <td>${process.arrival}</td>
             <td>${process.burst}</td>
-            ${priorityCell}
+            <td class="${isPriority ? "" : "hidden"}">
+                ${process.priority ?? 0}
+            </td>
             <td>
-                <button class="table-action"
+                <button type="button"
+                    class="text-button danger-text"
                     onclick="SamyangRemoveProcess(${index})">
                     Remove
                 </button>
@@ -331,77 +524,27 @@ function SamyangRenderProcessTable() {
 }
 
 
-// ESCAPE HTML
+// SCHEDULING LOGIC
 
-function SamyangEscapeHTML(value) {
-    return String(value).replace(/[&<>"']/g, character => {
-        const replacements = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#039;"
-        };
-
-        return replacements[character];
-    });
-}
-
-
-// RUN SIMULATION
-
-function SamyangRunSimulation() {
-    if (SamyangProcesses.length === 0) {
-        alert("Please add at least one process.");
-        return;
-    }
-
-    if (SamyangAlgorithm === "priority") {
-        const missingPriority = SamyangProcesses.some(process =>
-            process.priority === null || process.priority === undefined
-        );
-
-        if (missingPriority) {
-            alert("Please set a priority for every process.");
-            return;
-        }
-    }
-
-    SamyangShowLoading("Running simulation...", () => {
-        SamyangSchedule = SamyangScheduleProcesses();
-        SamyangCalculateResults();
-        SamyangDisplayResults();
-
-        document.getElementById("simulatorView").classList.add("hidden");
-        document.getElementById("resultsView").classList.remove("hidden");
-        document.getElementById("editProcessesButton").classList.remove("hidden");
-
-        window.scrollTo({ top: 0, behavior: "smooth" });
-
-        const overlay = document.getElementById("loadingOverlay");
-        overlay.classList.add("hidden");
-    });
-}
-
-
-// SCHEDULE PROCESSES
-
-function SamyangScheduleProcesses() {
-    const remaining = SamyangProcesses.map((process, index) => ({
-        ...process,
-        originalOrder: index
-    }));
-
-    const schedule = [];
+function SamyangScheduleProcesses(algorithm) {
+    let remaining = [...SamyangProcesses];
     let currentTime = 0;
 
+    SamyangSchedule = [];
+
     while (remaining.length > 0) {
-        const available = remaining.filter(process => process.arrival <= currentTime);
+        const available = remaining.filter(
+            process => process.arrival <= currentTime
+        );
+
+        // CPU IDLE TIME
 
         if (available.length === 0) {
-            const nextArrival = Math.min(...remaining.map(process => process.arrival));
+            const nextArrival = Math.min(
+                ...remaining.map(process => process.arrival)
+            );
 
-            schedule.push({
+            SamyangSchedule.push({
                 id: "Idle",
                 start: currentTime,
                 end: nextArrival,
@@ -412,102 +555,161 @@ function SamyangScheduleProcesses() {
             continue;
         }
 
-        let selectedProcess;
+        let selected;
 
-        if (SamyangAlgorithm === "fcfs") {
-            available.sort((a, b) =>
-                a.arrival - b.arrival || a.originalOrder - b.originalOrder
-            );
+        // FCFS
+
+        if (algorithm === "fcfs") {
+            selected = available.sort((a, b) =>
+                a.arrival - b.arrival ||
+                a.order - b.order
+            )[0];
         }
 
-        else if (SamyangAlgorithm === "sjf") {
-            available.sort((a, b) =>
+        // SJF
+
+        else if (algorithm === "sjf") {
+            selected = available.sort((a, b) =>
                 a.burst - b.burst ||
                 a.arrival - b.arrival ||
-                a.originalOrder - b.originalOrder
-            );
+                a.order - b.order
+            )[0];
         }
 
-        else if (SamyangAlgorithm === "priority") {
-            available.sort((a, b) =>
+        // PRIORITY
+
+        else {
+            selected = available.sort((a, b) =>
                 a.priority - b.priority ||
                 a.arrival - b.arrival ||
-                a.originalOrder - b.originalOrder
-            );
+                a.order - b.order
+            )[0];
         }
 
-        selectedProcess = available[0];
+        const start = currentTime;
+        const end = start + selected.burst;
 
-        const startTime = currentTime;
-        const endTime = currentTime + selectedProcess.burst;
-
-        schedule.push({
-            id: selectedProcess.id,
-            start: startTime,
-            end: endTime,
-            arrival: selectedProcess.arrival,
-            burst: selectedProcess.burst,
-            priority: selectedProcess.priority,
+        SamyangSchedule.push({
+            id: selected.id,
+            start: start,
+            end: end,
             idle: false
         });
 
-        currentTime = endTime;
+        currentTime = end;
 
-        const removeIndex = remaining.findIndex(process =>
-            process.originalOrder === selectedProcess.originalOrder
+        remaining = remaining.filter(
+            process => process !== selected
         );
-
-        remaining.splice(removeIndex, 1);
     }
-
-    return schedule;
 }
 
 
 // CALCULATE RESULTS
 
 function SamyangCalculateResults() {
-    SamyangResults = [];
+    SamyangResults = SamyangProcesses.map(process => {
+        const scheduled = SamyangSchedule.find(
+            item => item.id === process.id
+        );
 
-    SamyangSchedule.forEach(block => {
-        if (block.idle) return;
+        const completion = scheduled.end;
+        const turnaround = completion - process.arrival;
+        const waiting = turnaround - process.burst;
 
-        const completion = block.end;
-        const turnaround = completion - block.arrival;
-        const waiting = turnaround - block.burst;
-
-        SamyangResults.push({
-            id: block.id,
-            arrival: block.arrival,
-            burst: block.burst,
+        return {
+            ...process,
             completion: completion,
             turnaround: turnaround,
             waiting: waiting
-        });
+        };
     });
 }
 
 
+// RUN SIMULATION
+
+function SamyangRunSimulation() {
+    if (SamyangProcesses.length === 0) {
+        SamyangShowMessage(
+            "No Processes Added",
+            "Please add at least one process before running the simulation."
+        );
+
+        return;
+    }
+
+    SamyangShowLoading(
+        "Running CPU scheduling simulation...",
+        () => {
+            SamyangScheduleProcesses(SamyangAlgorithm);
+            SamyangCalculateResults();
+
+            SamyangDisplaySimulatorResults(SamyangAlgorithm);
+
+            const simulatorView = document.getElementById("simulatorView");
+            const resultsView = document.getElementById("resultsView");
+
+            if (simulatorView) {
+                simulatorView.classList.add("hidden");
+            }
+
+            if (resultsView) {
+                resultsView.classList.remove("hidden");
+            }
+
+            window.scrollTo({ top: 0, behavior: "smooth" });
+
+            SamyangHideLoading();
+        }
+    );
+}
+
+window.runSimulation = SamyangRunSimulation;
+
+
 // DISPLAY RESULTS
 
-function SamyangDisplayResults() {
-    const algorithm = SamyangAlgorithms[SamyangAlgorithm];
+function SamyangDisplaySimulatorResults(algorithm) {
+    const resultsAlgorithm = document.getElementById("resultsAlgorithm");
 
-    document.getElementById("resultsAlgorithm").textContent = algorithm.shortName;
+    if (resultsAlgorithm) {
+        resultsAlgorithm.textContent =
+            SamyangAlgorithmNames[algorithm] || algorithm.toUpperCase();
+    }
 
-    const totalWaiting = SamyangResults.reduce((sum, process) => sum + process.waiting, 0);
-    const totalTurnaround = SamyangResults.reduce((sum, process) => sum + process.turnaround, 0);
-    const totalBurst = SamyangResults.reduce((sum, process) => sum + process.burst, 0);
+    const totalWaiting = SamyangResults.reduce(
+        (sum, process) => sum + process.waiting,
+        0
+    );
 
-    const processCount = SamyangResults.length;
+    const totalTurnaround = SamyangResults.reduce(
+        (sum, process) => sum + process.turnaround,
+        0
+    );
 
-    document.getElementById("averageWaiting").textContent =
-        (totalWaiting / processCount).toFixed(2);
+    const totalBurst = SamyangResults.reduce(
+        (sum, process) => sum + process.burst,
+        0
+    );
 
-    document.getElementById("averageTurnaround").textContent =
-        (totalTurnaround / processCount).toFixed(2);
+    const averageWaiting = document.getElementById("averageWaiting");
+    const averageTurnaround = document.getElementById("averageTurnaround");
+    const totalBurstElement = document.getElementById("totalBurst");
 
-    document.getElementById("totalBurst").textContent = totalBurst;
+    if (averageWaiting) {
+        averageWaiting.textContent =
+            (totalWaiting / SamyangResults.length).toFixed(2);
+    }
+
+    if (averageTurnaround) {
+        averageTurnaround.textContent =
+            (totalTurnaround / SamyangResults.length).toFixed(2);
+    }
+
+    if (totalBurstElement) {
+        totalBurstElement.textContent = totalBurst;
+    }
 
     SamyangRenderResultsTable();
     SamyangRenderGanttChart();
@@ -519,18 +721,38 @@ function SamyangDisplayResults() {
 function SamyangRenderResultsTable() {
     const tableBody = document.getElementById("resultsTableBody");
 
+    if (!tableBody) return;
+
     tableBody.innerHTML = "";
 
     SamyangResults.forEach(process => {
         const row = document.createElement("tr");
 
         row.innerHTML = `
-            <td><strong>${SamyangEscapeHTML(process.id)}</strong></td>
+            <td class="result-process">
+                ${SamyangEscapeHTML(process.id)}
+            </td>
+
             <td>${process.arrival}</td>
             <td>${process.burst}</td>
-            <td>${process.completion}</td>
-            <td>${process.turnaround}</td>
-            <td>${process.waiting}</td>
+
+            <td>
+                <span class="result-number result-completion">
+                    ${process.completion}
+                </span>
+            </td>
+
+            <td>
+                <span class="result-number result-turnaround">
+                    ${process.turnaround}
+                </span>
+            </td>
+
+            <td>
+                <span class="result-number result-waiting">
+                    ${process.waiting}
+                </span>
+            </td>
         `;
 
         tableBody.appendChild(row);
@@ -543,66 +765,183 @@ function SamyangRenderResultsTable() {
 function SamyangRenderGanttChart() {
     const chart = document.getElementById("ganttChart");
 
+    if (!chart) return;
+
     chart.innerHTML = "";
 
-    const colors = [
-        "#8652d9",
-        "#ed75ad",
-        "#38a9bb",
-        "#b28b52",
-        "#8068a8",
-        "#cf7190"
-    ];
+    if (SamyangSchedule.length === 0) return;
 
     let processColorIndex = 0;
 
-    SamyangSchedule.forEach(block => {
-        const duration = block.end - block.start;
+    SamyangSchedule.forEach(item => {
+        const duration = item.end - item.start;
+        const block = document.createElement("div");
 
-        const item = document.createElement("div");
-        item.className = "gantt-item";
-
-        if (block.idle) {
-            item.classList.add("idle");
+        if (item.idle) {
+            block.className = "gantt-block idle";
         } else {
-            item.style.background = colors[processColorIndex % colors.length];
+            block.className =
+                `gantt-block process-${processColorIndex % 6}`;
+
             processColorIndex++;
         }
 
-        item.style.flexGrow = duration;
-        item.style.flexBasis = "0";
+        block.style.flexGrow = Math.max(duration, 1);
+        block.style.flexShrink = "0";
+        block.style.flexBasis = "0px";
 
-        item.innerHTML = `
-            ${SamyangEscapeHTML(block.id)}
-            <span class="gantt-time">${block.start}</span>
-            <span class="gantt-time end">${block.end}</span>
-        `;
+        const processName = document.createElement("strong");
+        processName.textContent = item.id;
 
-        chart.appendChild(item);
+        const time = document.createElement("div");
+        time.className = "gantt-time";
+        time.textContent = `${item.start} - ${item.end}`;
+
+        block.appendChild(processName);
+        block.appendChild(time);
+
+        chart.appendChild(block);
     });
 }
 
 
-// BACK TO SIMULATOR
+// RETURN TO PROCESS PAGE
 
 function SamyangBackToSimulator() {
-    document.getElementById("resultsView").classList.add("hidden");
-    document.getElementById("simulatorView").classList.remove("hidden");
-    document.getElementById("editProcessesButton").classList.add("hidden");
+    const resultsView = document.getElementById("resultsView");
+    const simulatorView = document.getElementById("simulatorView");
+
+    if (!resultsView || !simulatorView) return;
+
+    resultsView.classList.add("hidden");
+    simulatorView.classList.remove("hidden");
 
     window.scrollTo({ top: 0, behavior: "smooth" });
-
-    SamyangRenderProcessTable();
 }
 
 
-// START
+// RETURN TO ALGORITHM SELECTION
+
+function SamyangGoToAlgorithmSelection() {
+    SamyangShowLoading(
+        "Returning to algorithm selection...",
+        () => {
+            window.location.href = "index.html?select=1";
+        }
+    );
+}
+
+
+// INITIALIZE
 
 document.addEventListener("DOMContentLoaded", () => {
-    SamyangSetupTheme();
-    SamyangSetupHome();
 
-    if (document.getElementById("simulatorView")) {
-        SamyangSetupSimulator();
+    SamyangSetupTheme();
+    SamyangSetupHomePage();
+    SamyangCreateClearPopup();
+    SamyangCreateMessagePopup();
+
+    const simulatorView = document.getElementById("simulatorView");
+
+    if (!simulatorView) return;
+
+    const details = {
+        fcfs: {
+            title: "First Come, First Served",
+            description: "Processes are executed in the order they arrive.",
+            tag: "FCFS"
+        },
+
+        sjf: {
+            title: "Shortest Job First",
+            description: "The available process with the shortest burst time runs first.",
+            tag: "SJF"
+        },
+
+        priority: {
+            title: "Priority Scheduling",
+            description: "The available process with the highest priority runs first. A smaller number means higher priority.",
+            tag: "PRIORITY"
+        }
+    };
+
+    const selected = details[SamyangAlgorithm] || details.fcfs;
+
+    const algorithmTitle = document.getElementById("algorithmTitle");
+    const algorithmDescription = document.getElementById("algorithmDescription");
+    const selectedAlgorithm = document.getElementById("selectedAlgorithm");
+
+    if (algorithmTitle) {
+        algorithmTitle.textContent = selected.title;
     }
+
+    if (algorithmDescription) {
+        algorithmDescription.textContent = selected.description;
+    }
+
+    if (selectedAlgorithm) {
+        selectedAlgorithm.textContent = selected.tag;
+    }
+
+    const priorityGroup = document.getElementById("priorityGroup");
+
+    if (priorityGroup) {
+        priorityGroup.classList.toggle(
+            "hidden",
+            SamyangAlgorithm !== "priority"
+        );
+    }
+
+    const addButton = document.getElementById("addProcessButton");
+    const runButton = document.getElementById("runSimulationButton");
+    const clearButton = document.getElementById("clearProcessesButton");
+    const runAgainButton = document.getElementById("runAgainButton");
+    const chooseAlgorithmButton = document.getElementById("chooseAlgorithmButton");
+
+    if (addButton) {
+        addButton.onclick = SamyangAddProcess;
+    }
+
+    if (runButton) {
+        runButton.onclick = SamyangRunSimulation;
+    }
+
+    if (clearButton) {
+        clearButton.onclick = SamyangClearProcesses;
+    }
+
+    if (runAgainButton) {
+        runAgainButton.onclick = SamyangBackToSimulator;
+    }
+
+    if (chooseAlgorithmButton) {
+        chooseAlgorithmButton.onclick = SamyangGoToAlgorithmSelection;
+    }
+
+    SamyangRenderProcessTable();
+
+    // PRESS ENTER TO ADD A PROCESS
+
+    ["processID", "arrivalTime", "burstTime", "priority"].forEach(id => {
+        const input = document.getElementById(id);
+
+        if (input) {
+            input.addEventListener("keydown", event => {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    SamyangAddProcess();
+                }
+            });
+        }
+    });
+
+    // CLOSE POPUPS WITH ESCAPE
+
+    document.addEventListener("keydown", event => {
+        if (event.key === "Escape") {
+            SamyangCloseMessagePopup();
+            SamyangCloseClearPopup();
+        }
+    });
+
 });
