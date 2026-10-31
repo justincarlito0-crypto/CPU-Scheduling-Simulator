@@ -989,3 +989,19 @@ footer span {
     height: 100%;
     object-fit: contain;
 }
+/* Dark mode Gantt chart */
+body.dark-mode .gantt-block {
+    background: #514568;
+    color: #eee8f5;
+    border: 1px solid #695a80;
+}
+
+body.dark-mode .gantt-block:nth-child(2n) {
+    background: #59465d;
+}
+
+body.dark-mode .gantt-block.idle {
+    background: #292632;
+    color: #aaa2b5;
+    border: 1px dashed #514b5c;
+}
