@@ -1,223 +1,161 @@
-// LOAD PROCESSES
+
 let SamyangProcesses = JSON.parse(localStorage.getItem("cpuLabProcesses")) || [];
 let SamyangSchedule = [];
 let SamyangResults = [];
 
-let SamyangAlgorithm = new URLSearchParams(window.location.search).get("algorithm") || "fcfs";
+let SamyangAlgorithm =
+    new URLSearchParams(window.location.search).get("algorithm") || "fcfs";
 
 const SamyangAlgorithms = {
     fcfs: {
         name: "First Come, First Served",
         shortName: "FCFS",
-        description: "Processes are executed in the order they arrive.",
-        icon: "⏱",
-        method: "Arrival time",
-        sideText: "FCFS selects the process that arrives first in the ready queue.",
-        tip: "If two processes arrive at the same time, the one added first is selected first."
+        description: "Processes are executed in the order they arrive in the ready queue."
     },
 
     sjf: {
         name: "Shortest Job First",
         shortName: "SJF",
-        description: "The available process with the shortest burst time is executed first.",
-        icon: "⚡",
-        method: "Shortest burst time",
-        sideText: "SJF selects the available process with the smallest burst time.",
-        tip: "SJF only considers processes that have already arrived. It does not interrupt a running process."
+        description: "The available process with the shortest burst time is executed first."
     },
 
     priority: {
         name: "Priority Scheduling",
         shortName: "PRIORITY",
-        description: "The available process with the highest priority is executed first.",
-        icon: "✦",
-        method: "Priority number",
-        sideText: "Priority scheduling selects the available process with the highest priority.",
-        tip: "A smaller priority number means a higher priority. For example, priority 1 is higher than priority 3."
+        description: "The available process with the highest priority is executed first."
     }
 };
 
-// CUSTOM POPUP
-function SamyangPopup(SamyangTitle, SamyangMessage, SamyangType = "info", SamyangInput = null) {
-    return new Promise(function (resolve) {
-        const SamyangOverlay = document.createElement("div");
-        SamyangOverlay.className = "popup-overlay";
-
-        const SamyangBox = document.createElement("div");
-        SamyangBox.className = "popup-box";
-
-        const SamyangIcons = {
-            info: "✦",
-            success: "✓",
-            warning: "!",
-            question: "?",
-            input: "✎"
-        };
-
-        const SamyangIcon = document.createElement("div");
-        SamyangIcon.className = "popup-icon";
-        SamyangIcon.textContent = SamyangIcons[SamyangType] || "✦";
-
-        const SamyangHeading = document.createElement("h2");
-        SamyangHeading.className = "popup-title";
-        SamyangHeading.textContent = SamyangTitle;
-
-        const SamyangText = document.createElement("p");
-        SamyangText.className = "popup-message";
-        SamyangText.textContent = SamyangMessage;
-
-        SamyangBox.appendChild(SamyangIcon);
-        SamyangBox.appendChild(SamyangHeading);
-        SamyangBox.appendChild(SamyangText);
-
-        let SamyangInputElement = null;
-
-        if (SamyangInput !== null) {
-            SamyangInputElement = document.createElement("input");
-            SamyangInputElement.className = "popup-input";
-            SamyangInputElement.value = SamyangInput;
-            SamyangInputElement.type = "text";
-
-            SamyangBox.appendChild(SamyangInputElement);
-        }
-
-        const SamyangActions = document.createElement("div");
-        SamyangActions.className = "popup-actions";
-
-        const SamyangCancel = document.createElement("button");
-        SamyangCancel.className = "popup-cancel";
-        SamyangCancel.textContent = SamyangType === "info" ||
-            SamyangType === "success" ||
-            SamyangType === "warning" ? "CLOSE" : "CANCEL";
-
-        const SamyangConfirm = document.createElement("button");
-        SamyangConfirm.className = "popup-confirm";
-        SamyangConfirm.textContent = SamyangType === "question" ? "CONFIRM" :
-            SamyangType === "input" ? "SAVE" : "OK";
-
-        SamyangActions.appendChild(SamyangCancel);
-
-        if (SamyangType === "question" || SamyangType === "input") {
-            SamyangActions.appendChild(SamyangConfirm);
-        } else {
-            SamyangCancel.classList.add("popup-confirm");
-        }
-
-        SamyangBox.appendChild(SamyangActions);
-        SamyangOverlay.appendChild(SamyangBox);
-        document.body.appendChild(SamyangOverlay);
-
-        function SamyangClose(SamyangValue) {
-            SamyangOverlay.remove();
-            resolve(SamyangValue);
-        }
-
-        SamyangCancel.addEventListener("click", function () {
-            SamyangClose(SamyangType === "input" ? null : false);
-        });
-
-        SamyangConfirm.addEventListener("click", function () {
-            if (SamyangType === "input") {
-                SamyangClose(SamyangInputElement.value);
-            } else {
-                SamyangClose(true);
-            }
-        });
-
-        SamyangOverlay.addEventListener("click", function (event) {
-            if (event.target === SamyangOverlay) {
-                SamyangClose(SamyangType === "input" ? null : false);
-            }
-        });
-
-        if (SamyangInputElement) {
-            SamyangInputElement.focus();
-            SamyangInputElement.select();
-
-            SamyangInputElement.addEventListener("keydown", function (event) {
-                if (event.key === "Enter") {
-                    SamyangClose(SamyangInputElement.value);
-                }
-            });
-        }
-
-        if (SamyangType !== "question" && SamyangType !== "input") {
-            SamyangCancel.focus();
-        }
-    });
-}
 
 // SAVE PROCESSES
+
 function SamyangSaveProcesses() {
     localStorage.setItem("cpuLabProcesses", JSON.stringify(SamyangProcesses));
 }
 
-// SET UP THEME
-function SamyangSetupTheme() {
-    const SamyangThemeButton = document.getElementById("themeToggle");
 
-    if (!SamyangThemeButton) return;
+// LOADING SCREEN
 
-    const SamyangSavedTheme = localStorage.getItem("cpuTheme");
+function SamyangShowLoading(message, callback) {
+    const overlay = document.getElementById("loadingOverlay");
+    const loadingText = document.getElementById("loadingText");
 
-    if (SamyangSavedTheme === "dark") {
-        document.body.classList.add("dark");
-        SamyangThemeButton.textContent = "☾";
-    } else {
-        document.body.classList.remove("dark");
-        SamyangThemeButton.textContent = "☀";
+    if (loadingText) {
+        loadingText.textContent = message;
     }
 
-    SamyangThemeButton.addEventListener("click", function () {
-        document.body.classList.toggle("dark");
+    if (!overlay) {
+        if (callback) callback();
+        return;
+    }
 
-        const SamyangIsDark = document.body.classList.contains("dark");
+    overlay.classList.remove("hidden");
 
-        localStorage.setItem("cpuTheme", SamyangIsDark ? "dark" : "light");
-        SamyangThemeButton.textContent = SamyangIsDark ? "☾" : "☀";
+    // MAKE SURE THE BROWSER DISPLAYS THE LOADING SCREEN FIRST
+    overlay.style.display = "flex";
+
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                if (callback) {
+                    callback();
+                }
+            }, 1500);
+        });
     });
 }
 
-// SET UP SIMULATOR
-function SamyangSetupSimulator() {
-    if (!SamyangAlgorithms[SamyangAlgorithm]) {
-        SamyangAlgorithm = "fcfs";
+
+// THEME
+
+function SamyangSetupTheme() {
+    const themeButton = document.getElementById("themeToggle");
+
+    if (!themeButton) return;
+
+    const savedTheme = localStorage.getItem("cpuTheme") || "light";
+
+    document.documentElement.setAttribute("data-theme", savedTheme);
+    themeButton.textContent = savedTheme === "dark" ? "☀" : "☾";
+
+    themeButton.addEventListener("click", () => {
+        const currentTheme = document.documentElement.getAttribute("data-theme");
+        const newTheme = currentTheme === "dark" ? "light" : "dark";
+
+        document.documentElement.setAttribute("data-theme", newTheme);
+        localStorage.setItem("cpuTheme", newTheme);
+
+        themeButton.textContent = newTheme === "dark" ? "☀" : "☾";
+    });
+}
+
+
+// HOME PAGE
+
+function SamyangSetupHome() {
+    const welcomeScreen = document.getElementById("welcomeScreen");
+    const algorithmSelection = document.getElementById("algorithmSelection");
+    const getStartedButton = document.getElementById("getStartedButton");
+    const backButton = document.getElementById("backToWelcomeButton");
+
+    if (!welcomeScreen || !algorithmSelection) return;
+
+    if (getStartedButton) {
+        getStartedButton.addEventListener("click", () => {
+            welcomeScreen.classList.add("hidden");
+            algorithmSelection.classList.remove("hidden");
+        });
     }
 
-    const SamyangInfo = SamyangAlgorithms[SamyangAlgorithm];
+    if (backButton) {
+        backButton.addEventListener("click", () => {
+            algorithmSelection.classList.add("hidden");
+            welcomeScreen.classList.remove("hidden");
+        });
+    }
 
-    document.title = "PLACEHOLDER | " + SamyangInfo.shortName;
+    document.querySelectorAll(".algorithm-card").forEach(card => {
+        card.addEventListener("click", event => {
+            event.preventDefault();
 
-    document.getElementById("algorithmTitle").textContent = SamyangInfo.name;
-    document.getElementById("algorithmDescription").textContent = SamyangInfo.description;
-    document.getElementById("selectedAlgorithm").textContent = SamyangInfo.shortName;
+            const destination = card.getAttribute("href");
 
-    document.getElementById("sideAlgorithmIcon").textContent = SamyangInfo.icon;
-    document.getElementById("sideAlgorithmName").textContent = SamyangInfo.shortName;
-    document.getElementById("sideAlgorithmText").textContent = SamyangInfo.sideText;
-    document.getElementById("selectionMethod").textContent = SamyangInfo.method;
-    document.getElementById("sideTip").textContent = SamyangInfo.tip;
+            SamyangShowLoading("Opening simulator...", () => {
+                window.location.href = destination;
+            });
+        });
+    });
+}
+
+
+// SIMULATOR PAGE
+
+function SamyangSetupSimulator() {
+    const algorithm = SamyangAlgorithms[SamyangAlgorithm] || SamyangAlgorithms.fcfs;
+
+    document.getElementById("algorithmTitle").textContent = algorithm.name;
+    document.getElementById("algorithmDescription").textContent = algorithm.description;
+    document.getElementById("selectedAlgorithm").textContent = algorithm.shortName;
+
+    const priorityGroup = document.getElementById("priorityGroup");
 
     if (SamyangAlgorithm === "priority") {
-        document.getElementById("priorityGroup").classList.remove("hidden");
-        document.querySelectorAll(".priority-column").forEach(function (element) {
-            element.classList.remove("hidden");
-        });
+        priorityGroup.classList.remove("hidden");
+    } else {
+        priorityGroup.classList.add("hidden");
     }
 
     document.getElementById("addProcessButton").addEventListener("click", SamyangAddProcess);
     document.getElementById("clearProcessesButton").addEventListener("click", SamyangClearProcesses);
     document.getElementById("runSimulationButton").addEventListener("click", SamyangRunSimulation);
-
-    document.getElementById("backToSimulatorButton").addEventListener("click", SamyangBackToSimulator);
+    document.getElementById("editProcessesButton").addEventListener("click", SamyangBackToSimulator);
     document.getElementById("runAgainButton").addEventListener("click", SamyangBackToSimulator);
 
-    // ENTER TO ADD
-    ["processID", "arrivalTime", "burstTime", "priority"].forEach(function (id) {
-        const SamyangInput = document.getElementById(id);
+    ["processID", "arrivalTime", "burstTime", "priority"].forEach(id => {
+        const input = document.getElementById(id);
 
-        if (SamyangInput) {
-            SamyangInput.addEventListener("keydown", function (event) {
+        if (input) {
+            input.addEventListener("keydown", event => {
                 if (event.key === "Enter") {
                     SamyangAddProcess();
                 }
@@ -228,461 +166,443 @@ function SamyangSetupSimulator() {
     SamyangRenderProcessTable();
 }
 
+
 // ADD PROCESS
-async function SamyangAddProcess() {
-    const SamyangID = document.getElementById("processID").value.trim();
-    const SamyangArrival = document.getElementById("arrivalTime").value;
-    const SamyangBurst = document.getElementById("burstTime").value;
-    const SamyangPriorityInput = document.getElementById("priority").value;
 
-    if (!SamyangID || SamyangArrival === "" || SamyangBurst === "") {
-        await SamyangPopup("Missing Information", "Please fill in the Process ID, Arrival Time, and Burst Time.", "warning");
+function SamyangAddProcess() {
+    const id = document.getElementById("processID").value.trim();
+    const arrival = document.getElementById("arrivalTime").value;
+    const burst = document.getElementById("burstTime").value;
+    const priorityInput = document.getElementById("priority").value;
+
+    if (!id || arrival === "" || burst === "") {
+        alert("Please fill in the Process ID, Arrival Time, and Burst Time.");
         return;
     }
 
-    if (Number(SamyangArrival) < 0 || Number(SamyangBurst) <= 0 ||
-        !Number.isFinite(Number(SamyangArrival)) ||
-        !Number.isFinite(Number(SamyangBurst))) {
-        await SamyangPopup("Invalid Values", "Arrival time must be 0 or higher, and burst time must be greater than 0.", "warning");
+    if (Number(arrival) < 0 || !Number.isInteger(Number(arrival))) {
+        alert("Arrival Time must be a non-negative whole number.");
         return;
     }
 
-    if (SamyangProcesses.some(function (process) {
-        return process.id.toLowerCase() === SamyangID.toLowerCase();
-    })) {
-        await SamyangPopup("Duplicate Process", "That Process ID already exists. Please use another ID.", "warning");
+    if (Number(burst) <= 0 || !Number.isInteger(Number(burst))) {
+        alert("Burst Time must be a positive whole number.");
         return;
     }
 
-    let SamyangPriorityValue = null;
+    if (SamyangProcesses.some(process => process.id.toLowerCase() === id.toLowerCase())) {
+        alert("That Process ID already exists.");
+        return;
+    }
+
+    let priority = null;
 
     if (SamyangAlgorithm === "priority") {
-        if (SamyangPriorityInput === "" || Number(SamyangPriorityInput) < 1 ||
-            !Number.isInteger(Number(SamyangPriorityInput))) {
-            await SamyangPopup("Priority Required", "Please enter a whole-number priority of 1 or higher.", "warning");
+        if (priorityInput === "" || Number(priorityInput) < 1 ||
+            !Number.isInteger(Number(priorityInput))) {
+            alert("Please enter a valid priority number.");
             return;
         }
 
-        SamyangPriorityValue = Number(SamyangPriorityInput);
+        priority = Number(priorityInput);
     }
 
     SamyangProcesses.push({
-        id: SamyangID,
-        arrival: Number(SamyangArrival),
-        burst: Number(SamyangBurst),
-        priority: SamyangPriorityValue
+        id: id,
+        arrival: Number(arrival),
+        burst: Number(burst),
+        priority: priority,
+        order: SamyangProcesses.length
     });
 
     SamyangSaveProcesses();
-    SamyangRenderProcessTable();
 
     document.getElementById("processID").value = "";
     document.getElementById("arrivalTime").value = "";
     document.getElementById("burstTime").value = "";
     document.getElementById("priority").value = "";
-    document.getElementById("processID").focus();
 
-    await SamyangPopup("Process Added!", SamyangID + " has been added to your process queue.", "success");
+    SamyangRenderProcessTable();
 }
+
 
 // REMOVE PROCESS
-async function SamyangRemoveProcess(SamyangIndex) {
-    const SamyangProcess = SamyangProcesses[SamyangIndex];
 
-    const SamyangConfirmed = await SamyangPopup(
-        "Remove Process?",
-        "Do you want to remove " + SamyangProcess.id + " from the queue?",
-        "question"
-    );
+function SamyangRemoveProcess(index) {
+    if (!confirm("Remove this process?")) return;
 
-    if (!SamyangConfirmed) return;
-
-    SamyangProcesses.splice(SamyangIndex, 1);
+    SamyangProcesses.splice(index, 1);
 
     SamyangSaveProcesses();
     SamyangRenderProcessTable();
 }
+
 
 // SET PRIORITY
-async function SamyangSetPriority(SamyangIndex) {
-    const SamyangProcess = SamyangProcesses[SamyangIndex];
 
-    const SamyangNewPriority = await SamyangPopup(
-        "Set Process Priority",
-        "Enter a priority for " + SamyangProcess.id + ". A smaller number means higher priority.",
-        "input",
-        SamyangProcess.priority ?? 1
-    );
+function SamyangSetPriority(index) {
+    const current = SamyangProcesses[index].priority ?? "";
 
-    if (SamyangNewPriority === null) return;
+    const answer = prompt("Enter priority number (smaller number = higher priority):", current);
 
-    if (SamyangNewPriority.trim() === "" ||
-        !Number.isInteger(Number(SamyangNewPriority)) ||
-        Number(SamyangNewPriority) < 1) {
-        await SamyangPopup("Invalid Priority", "Priority must be a whole number of 1 or higher.", "warning");
+    if (answer === null) return;
+
+    if (answer.trim() === "" || Number(answer) < 1 ||
+        !Number.isInteger(Number(answer))) {
+        alert("Please enter a valid positive whole number.");
         return;
     }
 
-    SamyangProcess.priority = Number(SamyangNewPriority);
+    SamyangProcesses[index].priority = Number(answer);
 
     SamyangSaveProcesses();
     SamyangRenderProcessTable();
-
-    await SamyangPopup("Priority Updated!", SamyangProcess.id + " now has priority " + SamyangProcess.priority + ".", "success");
 }
 
-// CLEAR ALL PROCESSES
-async function SamyangClearProcesses() {
-    if (SamyangProcesses.length === 0) {
-        await SamyangPopup("Queue Is Empty", "There are no processes to clear.", "info");
-        return;
-    }
 
-    const SamyangConfirmed = await SamyangPopup(
-        "Clear All Processes?",
-        "This will remove every process from your queue.",
-        "question"
-    );
+// CLEAR PROCESSES
 
-    if (!SamyangConfirmed) return;
+function SamyangClearProcesses() {
+    if (SamyangProcesses.length === 0) return;
+
+    if (!confirm("Are you sure you want to clear all processes?")) return;
 
     SamyangProcesses = [];
 
     SamyangSaveProcesses();
     SamyangRenderProcessTable();
-
-    await SamyangPopup("Queue Cleared", "All processes have been removed.", "success");
 }
 
-// DISPLAY PROCESS TABLE
+
+// RENDER PROCESS TABLE
+
 function SamyangRenderProcessTable() {
-    const SamyangTable = document.getElementById("processTable");
-    const SamyangCount = document.getElementById("processCount");
+    const tableBody = document.getElementById("processTableBody");
+    const count = document.getElementById("processCount");
+    const emptyMessage = document.getElementById("emptyProcessMessage");
 
-    SamyangTable.innerHTML = "";
+    if (!tableBody) return;
 
-    SamyangCount.textContent = SamyangProcesses.length +
-        (SamyangProcesses.length === 1 ? " PROCESS" : " PROCESSES");
+    tableBody.innerHTML = "";
 
-    if (SamyangProcesses.length === 0) {
-        const SamyangRow = document.createElement("tr");
-        const SamyangCell = document.createElement("td");
+    const priorityColumns = document.querySelectorAll(".priority-column");
 
-        SamyangCell.colSpan = SamyangAlgorithm === "priority" ? 5 : 4;
-        SamyangCell.className = "empty-table";
-        SamyangCell.textContent = "No processes added yet.";
+    priorityColumns.forEach(column => {
+        column.classList.toggle("hidden", SamyangAlgorithm !== "priority");
+    });
 
-        SamyangRow.appendChild(SamyangCell);
-        SamyangTable.appendChild(SamyangRow);
-        return;
-    }
+    count.textContent = `${SamyangProcesses.length} process${SamyangProcesses.length === 1 ? "" : "es"}`;
 
-    SamyangProcesses.forEach(function (process, index) {
-        const SamyangRow = document.createElement("tr");
+    emptyMessage.classList.toggle("hidden", SamyangProcesses.length > 0);
 
-        const SamyangIDCell = document.createElement("td");
-        const SamyangIDPill = document.createElement("span");
+    SamyangProcesses.forEach((process, index) => {
+        const row = document.createElement("tr");
 
-        SamyangIDPill.className = "process-pill";
-        SamyangIDPill.textContent = process.id;
-        SamyangIDCell.appendChild(SamyangIDPill);
-
-        const SamyangArrivalCell = document.createElement("td");
-        SamyangArrivalCell.textContent = process.arrival;
-
-        const SamyangBurstCell = document.createElement("td");
-        SamyangBurstCell.textContent = process.burst;
-
-        SamyangRow.appendChild(SamyangIDCell);
-        SamyangRow.appendChild(SamyangArrivalCell);
-        SamyangRow.appendChild(SamyangBurstCell);
+        let priorityCell = "";
 
         if (SamyangAlgorithm === "priority") {
-            const SamyangPriorityCell = document.createElement("td");
-            const SamyangPriorityButton = document.createElement("button");
+            const priorityText = process.priority ?? "Set";
 
-            SamyangPriorityButton.className = "text-button";
-            SamyangPriorityButton.textContent =
-                process.priority === null ? "Set priority" : process.priority;
-
-            SamyangPriorityButton.addEventListener("click", function () {
-                SamyangSetPriority(index);
-            });
-
-            SamyangPriorityCell.appendChild(SamyangPriorityButton);
-            SamyangRow.appendChild(SamyangPriorityCell);
+            priorityCell = `
+                <td>
+                    <button class="table-action priority-button"
+                        onclick="SamyangSetPriority(${index})">
+                        ${priorityText}
+                    </button>
+                </td>
+            `;
         }
 
-        const SamyangActionCell = document.createElement("td");
-        const SamyangRemoveButton = document.createElement("button");
+        row.innerHTML = `
+            <td><strong>${SamyangEscapeHTML(process.id)}</strong></td>
+            <td>${process.arrival}</td>
+            <td>${process.burst}</td>
+            ${priorityCell}
+            <td>
+                <button class="table-action"
+                    onclick="SamyangRemoveProcess(${index})">
+                    Remove
+                </button>
+            </td>
+        `;
 
-        SamyangRemoveButton.className = "remove-button";
-        SamyangRemoveButton.textContent = "×";
-        SamyangRemoveButton.title = "Remove process";
-
-        SamyangRemoveButton.addEventListener("click", function () {
-            SamyangRemoveProcess(index);
-        });
-
-        SamyangActionCell.appendChild(SamyangRemoveButton);
-        SamyangRow.appendChild(SamyangActionCell);
-
-        SamyangTable.appendChild(SamyangRow);
+        tableBody.appendChild(row);
     });
 }
+
+
+// ESCAPE HTML
+
+function SamyangEscapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => {
+        const replacements = {
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#039;"
+        };
+
+        return replacements[character];
+    });
+}
+
 
 // RUN SIMULATION
-async function SamyangRunSimulation() {
+
+function SamyangRunSimulation() {
     if (SamyangProcesses.length === 0) {
-        await SamyangPopup("No Processes Found", "Add at least one process before running the simulation.", "warning");
+        alert("Please add at least one process.");
         return;
     }
 
-    if (SamyangAlgorithm === "priority" &&
-        SamyangProcesses.some(function (process) {
-            return process.priority === null || process.priority === undefined;
-        })) {
-        await SamyangPopup("Priority Missing", "Please set a priority for every process before running the simulation.", "warning");
-        return;
+    if (SamyangAlgorithm === "priority") {
+        const missingPriority = SamyangProcesses.some(process =>
+            process.priority === null || process.priority === undefined
+        );
+
+        if (missingPriority) {
+            alert("Please set a priority for every process.");
+            return;
+        }
     }
 
-    SamyangSchedule = SamyangScheduleProcesses();
-    SamyangResults = SamyangCalculateResults(SamyangSchedule);
+    SamyangShowLoading("Running simulation...", () => {
+        SamyangSchedule = SamyangScheduleProcesses();
+        SamyangCalculateResults();
+        SamyangDisplayResults();
 
-    SamyangDisplayResults();
+        document.getElementById("simulatorView").classList.add("hidden");
+        document.getElementById("resultsView").classList.remove("hidden");
+        document.getElementById("editProcessesButton").classList.remove("hidden");
 
-    document.getElementById("simulatorView").classList.add("hidden");
-    document.getElementById("resultsView").classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
+        const overlay = document.getElementById("loadingOverlay");
+        overlay.classList.add("hidden");
+    });
 }
 
+
 // SCHEDULE PROCESSES
+
 function SamyangScheduleProcesses() {
-    let SamyangRemaining = SamyangProcesses.map(function (process, index) {
-        return {
-            ...process,
-            originalIndex: index
-        };
-    });
+    const remaining = SamyangProcesses.map((process, index) => ({
+        ...process,
+        originalOrder: index
+    }));
 
-    let SamyangTimeline = [];
-    let SamyangCurrentTime = 0;
+    const schedule = [];
+    let currentTime = 0;
 
-    while (SamyangRemaining.length > 0) {
-        const SamyangAvailable = SamyangRemaining.filter(function (process) {
-            return process.arrival <= SamyangCurrentTime;
-        });
+    while (remaining.length > 0) {
+        const available = remaining.filter(process => process.arrival <= currentTime);
 
-        if (SamyangAvailable.length === 0) {
-            const SamyangNextArrival = Math.min.apply(
-                null,
-                SamyangRemaining.map(function (process) {
-                    return process.arrival;
-                })
-            );
+        if (available.length === 0) {
+            const nextArrival = Math.min(...remaining.map(process => process.arrival));
 
-            SamyangTimeline.push({
+            schedule.push({
                 id: "Idle",
-                start: SamyangCurrentTime,
-                end: SamyangNextArrival,
+                start: currentTime,
+                end: nextArrival,
                 idle: true
             });
 
-            SamyangCurrentTime = SamyangNextArrival;
+            currentTime = nextArrival;
             continue;
         }
 
-        // CHOOSE NEXT PROCESS
-        SamyangAvailable.sort(function (a, b) {
-            if (SamyangAlgorithm === "sjf") {
-                return a.burst - b.burst ||
-                    a.arrival - b.arrival ||
-                    a.originalIndex - b.originalIndex;
-            }
+        let selectedProcess;
 
-            if (SamyangAlgorithm === "priority") {
-                return a.priority - b.priority ||
-                    a.arrival - b.arrival ||
-                    a.originalIndex - b.originalIndex;
-            }
+        if (SamyangAlgorithm === "fcfs") {
+            available.sort((a, b) =>
+                a.arrival - b.arrival || a.originalOrder - b.originalOrder
+            );
+        }
 
-            return a.arrival - b.arrival ||
-                a.originalIndex - b.originalIndex;
-        });
+        else if (SamyangAlgorithm === "sjf") {
+            available.sort((a, b) =>
+                a.burst - b.burst ||
+                a.arrival - b.arrival ||
+                a.originalOrder - b.originalOrder
+            );
+        }
 
-        const SamyangSelected = SamyangAvailable[0];
-        const SamyangStart = SamyangCurrentTime;
-        const SamyangEnd = SamyangStart + SamyangSelected.burst;
+        else if (SamyangAlgorithm === "priority") {
+            available.sort((a, b) =>
+                a.priority - b.priority ||
+                a.arrival - b.arrival ||
+                a.originalOrder - b.originalOrder
+            );
+        }
 
-        SamyangTimeline.push({
-            id: SamyangSelected.id,
-            arrival: SamyangSelected.arrival,
-            burst: SamyangSelected.burst,
-            priority: SamyangSelected.priority,
-            start: SamyangStart,
-            end: SamyangEnd,
+        selectedProcess = available[0];
+
+        const startTime = currentTime;
+        const endTime = currentTime + selectedProcess.burst;
+
+        schedule.push({
+            id: selectedProcess.id,
+            start: startTime,
+            end: endTime,
+            arrival: selectedProcess.arrival,
+            burst: selectedProcess.burst,
+            priority: selectedProcess.priority,
             idle: false
         });
 
-        SamyangCurrentTime = SamyangEnd;
+        currentTime = endTime;
 
-        SamyangRemaining = SamyangRemaining.filter(function (process) {
-            return process.originalIndex !== SamyangSelected.originalIndex;
-        });
+        const removeIndex = remaining.findIndex(process =>
+            process.originalOrder === selectedProcess.originalOrder
+        );
+
+        remaining.splice(removeIndex, 1);
     }
 
-    return SamyangTimeline;
+    return schedule;
 }
 
-// CALCULATE RESULTS
-function SamyangCalculateResults(SamyangTimeline) {
-    let SamyangFinalResults = [];
 
-    SamyangTimeline.forEach(function (block) {
+// CALCULATE RESULTS
+
+function SamyangCalculateResults() {
+    SamyangResults = [];
+
+    SamyangSchedule.forEach(block => {
         if (block.idle) return;
 
-        const SamyangCompletion = block.end;
-        const SamyangTurnaround = SamyangCompletion - block.arrival;
-        const SamyangWaiting = SamyangTurnaround - block.burst;
+        const completion = block.end;
+        const turnaround = completion - block.arrival;
+        const waiting = turnaround - block.burst;
 
-        SamyangFinalResults.push({
+        SamyangResults.push({
             id: block.id,
             arrival: block.arrival,
             burst: block.burst,
-            completion: SamyangCompletion,
-            turnaround: SamyangTurnaround,
-            waiting: SamyangWaiting
+            completion: completion,
+            turnaround: turnaround,
+            waiting: waiting
         });
     });
-
-    return SamyangFinalResults;
 }
+
 
 // DISPLAY RESULTS
+
 function SamyangDisplayResults() {
-    const SamyangResultsTable = document.getElementById("resultsTable");
-    const SamyangGanttChart = document.getElementById("ganttChart");
+    const algorithm = SamyangAlgorithms[SamyangAlgorithm];
 
-    SamyangResultsTable.innerHTML = "";
-    SamyangGanttChart.innerHTML = "";
+    document.getElementById("resultsAlgorithm").textContent = algorithm.shortName;
 
-    document.getElementById("resultsAlgorithm").textContent =
-        SamyangAlgorithms[SamyangAlgorithm].shortName;
+    const totalWaiting = SamyangResults.reduce((sum, process) => sum + process.waiting, 0);
+    const totalTurnaround = SamyangResults.reduce((sum, process) => sum + process.turnaround, 0);
+    const totalBurst = SamyangResults.reduce((sum, process) => sum + process.burst, 0);
 
-    const SamyangColors = [
-        "linear-gradient(135deg, #9a68e8, #c078dc)",
-        "linear-gradient(135deg, #e66fa9, #f49bc0)",
-        "linear-gradient(135deg, #38afc5, #64c9d7)",
-        "linear-gradient(135deg, #e8a84c, #f2c66f)",
-        "linear-gradient(135deg, #8264d6, #a68ae8)"
-    ];
-
-    SamyangSchedule.forEach(function (block, index) {
-        const SamyangItem = document.createElement("div");
-
-        SamyangItem.className = "gantt-item" + (block.idle ? " idle" : "");
-
-        if (!block.idle) {
-            SamyangItem.style.background =
-                SamyangColors[index % SamyangColors.length];
-        }
-
-        SamyangItem.style.flex = (block.end - block.start) + " 1 0";
-        SamyangItem.style.animationDelay = (index * 0.12) + "s";
-
-        const SamyangName = document.createElement("strong");
-        SamyangName.textContent = block.id;
-
-        const SamyangDuration = document.createElement("small");
-        SamyangDuration.textContent =
-            (block.end - block.start) + " unit" +
-            (block.end - block.start === 1 ? "" : "s");
-
-        const SamyangTimes = document.createElement("div");
-        SamyangTimes.className = "gantt-times";
-
-        const SamyangStart = document.createElement("span");
-        SamyangStart.textContent = block.start;
-
-        const SamyangEnd = document.createElement("span");
-        SamyangEnd.textContent = block.end;
-
-        SamyangTimes.appendChild(SamyangStart);
-        SamyangTimes.appendChild(SamyangEnd);
-
-        SamyangItem.appendChild(SamyangName);
-        SamyangItem.appendChild(SamyangDuration);
-        SamyangItem.appendChild(SamyangTimes);
-
-        SamyangGanttChart.appendChild(SamyangItem);
-    });
-
-    // DISPLAY RESULTS TABLE
-    SamyangResults.forEach(function (result, index) {
-        const SamyangRow = document.createElement("tr");
-        SamyangRow.style.animationDelay = (index * 0.1) + "s";
-
-        const SamyangValues = [
-            result.id,
-            result.arrival,
-            result.burst,
-            result.completion,
-            result.turnaround,
-            result.waiting
-        ];
-
-        SamyangValues.forEach(function (value, cellIndex) {
-            const SamyangCell = document.createElement("td");
-
-            if (cellIndex === 0) {
-                const SamyangPill = document.createElement("span");
-                SamyangPill.className = "process-pill";
-                SamyangPill.textContent = value;
-                SamyangCell.appendChild(SamyangPill);
-            } else {
-                SamyangCell.textContent = value;
-            }
-
-            SamyangRow.appendChild(SamyangCell);
-        });
-
-        SamyangResultsTable.appendChild(SamyangRow);
-    });
-
-    // DISPLAY AVERAGES
-    const SamyangTotalWaiting = SamyangResults.reduce(function (total, result) {
-        return total + result.waiting;
-    }, 0);
-
-    const SamyangTotalTurnaround = SamyangResults.reduce(function (total, result) {
-        return total + result.turnaround;
-    }, 0);
-
-    const SamyangTotalBurst = SamyangProcesses.reduce(function (total, process) {
-        return total + process.burst;
-    }, 0);
+    const processCount = SamyangResults.length;
 
     document.getElementById("averageWaiting").textContent =
-        (SamyangTotalWaiting / SamyangResults.length).toFixed(2);
+        (totalWaiting / processCount).toFixed(2);
 
     document.getElementById("averageTurnaround").textContent =
-        (SamyangTotalTurnaround / SamyangResults.length).toFixed(2);
+        (totalTurnaround / processCount).toFixed(2);
 
-    document.getElementById("totalBurst").textContent = SamyangTotalBurst;
+    document.getElementById("totalBurst").textContent = totalBurst;
+
+    SamyangRenderResultsTable();
+    SamyangRenderGanttChart();
 }
 
+
+// RESULTS TABLE
+
+function SamyangRenderResultsTable() {
+    const tableBody = document.getElementById("resultsTableBody");
+
+    tableBody.innerHTML = "";
+
+    SamyangResults.forEach(process => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td><strong>${SamyangEscapeHTML(process.id)}</strong></td>
+            <td>${process.arrival}</td>
+            <td>${process.burst}</td>
+            <td>${process.completion}</td>
+            <td>${process.turnaround}</td>
+            <td>${process.waiting}</td>
+        `;
+
+        tableBody.appendChild(row);
+    });
+}
+
+
+// GANTT CHART
+
+function SamyangRenderGanttChart() {
+    const chart = document.getElementById("ganttChart");
+
+    chart.innerHTML = "";
+
+    const colors = [
+        "#8652d9",
+        "#ed75ad",
+        "#38a9bb",
+        "#b28b52",
+        "#8068a8",
+        "#cf7190"
+    ];
+
+    let processColorIndex = 0;
+
+    SamyangSchedule.forEach(block => {
+        const duration = block.end - block.start;
+
+        const item = document.createElement("div");
+        item.className = "gantt-item";
+
+        if (block.idle) {
+            item.classList.add("idle");
+        } else {
+            item.style.background = colors[processColorIndex % colors.length];
+            processColorIndex++;
+        }
+
+        item.style.flexGrow = duration;
+        item.style.flexBasis = "0";
+
+        item.innerHTML = `
+            ${SamyangEscapeHTML(block.id)}
+            <span class="gantt-time">${block.start}</span>
+            <span class="gantt-time end">${block.end}</span>
+        `;
+
+        chart.appendChild(item);
+    });
+}
+
+
 // BACK TO SIMULATOR
+
 function SamyangBackToSimulator() {
     document.getElementById("resultsView").classList.add("hidden");
     document.getElementById("simulatorView").classList.remove("hidden");
+    document.getElementById("editProcessesButton").classList.add("hidden");
 
     window.scrollTo({ top: 0, behavior: "smooth" });
+
+    SamyangRenderProcessTable();
 }
 
-// START EVERYTHING
-SamyangSetupTheme();
 
-if (document.getElementById("simulatorView")) {
-    SamyangSetupSimulator();
-}
+// START
+
+document.addEventListener("DOMContentLoaded", () => {
+    SamyangSetupTheme();
+    SamyangSetupHome();
+
+    if (document.getElementById("simulatorView")) {
+        SamyangSetupSimulator();
+    }
+});

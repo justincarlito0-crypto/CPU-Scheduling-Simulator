@@ -1,153 +1,134 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PLACEHOLDER | CPU Scheduling</title>
+    <title>CPU Scheduling Simulator</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <header class="topbar">
         <a href="index.html" class="brand">
-            <span class="brand-icon">P</span>
-            <span>PLACEHOLDER</span>
+            <span class="brand-mark">P</span>
+            <span>CPU Scheduling Simulator</span>
         </a>
 
-        <button id="themeToggle" class="theme-toggle">☀</button>
+        <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">☾</button>
     </header>
 
     <main class="home-container">
 
-        <section class="hero">
-            <div class="hero-label">
-                <span class="pulse-dot"></span>
-                OPERATING SYSTEMS PROJECT
-            </div>
+        <!-- WELCOME SCREEN -->
+        <section id="welcomeScreen" class="welcome-screen">
+            <div class="welcome-label">OPERATING SYSTEMS PROJECT</div>
 
-            <h1>
-                CPU Scheduling<br>
-                <span class="gradient-text">Simulator.</span>
-            </h1>
+            <h1>Welcome to the<br><span>CPU Scheduling Simulator.</span></h1>
 
             <p>
-                Explore CPU scheduling algorithms through an interactive
-                simulation. Configure processes, run algorithms, and
-                compare their performance.
+                Explore how different CPU scheduling algorithms manage processes.
+                Add processes, run simulations, and compare their results.
             </p>
 
-            <div class="hero-decoration">
-                <div class="cpu-chip">
+            <button id="getStartedButton" class="primary-button">
+                Get Started <span>→</span>
+            </button>
+
+            <div class="welcome-decoration">
+                <div class="decoration-chip">
                     <span>CPU</span>
-                    <div class="cpu-bars">
+                    <div class="chip-bars">
                         <i></i><i></i><i></i><i></i><i></i>
                     </div>
                 </div>
-                <div class="orbit orbit-one"></div>
-                <div class="orbit orbit-two"></div>
-                <span class="floating-dot dot-one"></span>
-                <span class="floating-dot dot-two"></span>
-                <span class="floating-dot dot-three"></span>
             </div>
         </section>
 
-        <section class="algorithm-section">
-            <div class="section-heading">
-                <div>
-                    <span class="eyebrow">GET STARTED</span>
-                    <h2>Choose an algorithm</h2>
-                </div>
-                <span class="algorithm-count">03 ALGORITHMS</span>
-            </div>
+        <!-- ALGORITHM SELECTION -->
+        <section id="algorithmSelection" class="algorithm-selection hidden">
+            <button id="backToWelcomeButton" class="text-button">← Back</button>
+
+            <div class="welcome-label">SIMULATION OPTIONS</div>
+            <h1>Choose an algorithm.</h1>
+            <p class="section-description">
+                Select a scheduling algorithm to begin your simulation.
+            </p>
 
             <div class="algorithm-grid">
 
-                <a href="simulator.html?algorithm=fcfs" class="algorithm-card fcfs-card">
-                    <div class="card-top">
-                        <span class="algorithm-number">01</span>
-                        <span class="card-arrow">↗</span>
-                    </div>
-                    <div class="algorithm-icon">⏱</div>
-                    <h3>First Come, First Served</h3>
+                <a href="simulator.html?algorithm=fcfs" class="algorithm-card">
+                    <div class="algorithm-number">01</div>
+                    <h2>First Come, First Served</h2>
                     <p>
-                        Processes are executed in the order they arrive
-                        in the ready queue.
+                        Processes are executed in the order they arrive in the ready queue.
                     </p>
-                    <div class="card-tags">
-                        <span>Non-preemptive</span>
-                        <span>Arrival order</span>
+                    <div class="algorithm-footer">
+                        <span>FCFS</span>
+                        <span class="card-arrow">→</span>
                     </div>
-                    <div class="card-action">START SIMULATION <span>→</span></div>
                 </a>
 
-                <a href="simulator.html?algorithm=sjf" class="algorithm-card sjf-card">
-                    <div class="card-top">
-                        <span class="algorithm-number">02</span>
-                        <span class="card-arrow">↗</span>
-                    </div>
-                    <div class="algorithm-icon">⚡</div>
-                    <h3>Shortest Job First</h3>
+                <a href="simulator.html?algorithm=sjf" class="algorithm-card">
+                    <div class="algorithm-number">02</div>
+                    <h2>Shortest Job First</h2>
                     <p>
-                        The available process with the shortest burst
-                        time is executed first.
+                        The available process with the shortest burst time is executed first.
                     </p>
-                    <div class="card-tags">
-                        <span>Non-preemptive</span>
-                        <span>Burst time</span>
+                    <div class="algorithm-footer">
+                        <span>SJF</span>
+                        <span class="card-arrow">→</span>
                     </div>
-                    <div class="card-action">START SIMULATION <span>→</span></div>
                 </a>
 
-                <a href="simulator.html?algorithm=priority" class="algorithm-card priority-card">
-                    <div class="card-top">
-                        <span class="algorithm-number">03</span>
-                        <span class="card-arrow">↗</span>
-                    </div>
-                    <div class="algorithm-icon">✦</div>
-                    <h3>Priority Scheduling</h3>
+                <a href="simulator.html?algorithm=priority" class="algorithm-card">
+                    <div class="algorithm-number">03</div>
+                    <h2>Priority Scheduling</h2>
                     <p>
-                        The available process with the highest priority
-                        is selected first.
+                        The available process with the highest priority is executed first.
                     </p>
-                    <div class="card-tags">
-                        <span>Non-preemptive</span>
-                        <span>Priority number</span>
+                    <div class="algorithm-footer">
+                        <span>PRIORITY</span>
+                        <span class="card-arrow">→</span>
                     </div>
-                    <div class="card-action">START SIMULATION <span>→</span></div>
                 </a>
 
-            </div>
-        </section>
-
-        <section class="info-strip">
-            <div>
-                <span class="info-icon">⌁</span>
-                <div>
-                    <strong>Interactive Gantt Chart</strong>
-                    <p>Visualize process execution order.</p>
-                </div>
-            </div>
-            <div>
-                <span class="info-icon pink-icon">◈</span>
-                <div>
-                    <strong>Performance Analysis</strong>
-                    <p>Compare waiting and turnaround times.</p>
-                </div>
-            </div>
-            <div>
-                <span class="info-icon cyan-icon">⌘</span>
-                <div>
-                    <strong>Simple Simulation</strong>
-                    <p>Configure and run your own processes.</p>
-                </div>
             </div>
         </section>
 
     </main>
 
-    <footer class="footer">
-        PLACEHOLDER <span>•</span> CPU SCHEDULING SIMULATOR
+    <footer class="site-footer">
+        <span>CPU Scheduling Simulator</span>
+        <span>Operating Systems Project</span>
     </footer>
+
+    <!-- LOADING SCREEN -->
+    <div id="loadingOverlay" class="loading-overlay hidden">
+        <div class="loading-content">
+
+            <div class="loading-animation">
+                <div class="loading-orbit orbit-a"></div>
+                <div class="loading-orbit orbit-b"></div>
+
+                <div class="loading-core">
+                    <span>CPU</span>
+                    <div class="loading-bars">
+                        <i></i><i></i><i></i><i></i><i></i>
+                    </div>
+                </div>
+            </div>
+
+            <h2 id="loadingText">Preparing simulator...</h2>
+            <p>Please wait while everything gets ready.</p>
+
+            <div class="loading-progress">
+                <div class="loading-progress-bar"></div>
+            </div>
+
+            <span class="loading-status">PROCESSING</span>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
