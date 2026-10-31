@@ -1,196 +1,301 @@
-let processes = [];
 
+let SamyangProcesses = [];
+
+// Add process
 function addProcess() {
-    let id = document.getElementById("processID").value;
-    let arrivalInput = document.getElementById("arrivalTime").value;
-    let burstInput = document.getElementById("burstTime").value;
+    SamyangAddProcess();
+}
 
-    let arrival = Number(arrivalInput);
-    let burst = Number(burstInput);
+function SamyangAddProcess() {
+    let SamyangID = document.getElementById("processID").value;
+    let SamyangArrivalInput = document.getElementById("arrivalTime").value;
+    let SamyangBurstInput = document.getElementById("burstTime").value;
 
-    if (id.trim() === "" || arrivalInput === "" || burstInput === "" || arrival < 0 || burst <= 0) {
+    let SamyangArrival = Number(SamyangArrivalInput);
+    let SamyangBurst = Number(SamyangBurstInput);
+
+    if (SamyangID.trim() === "" || SamyangArrivalInput === "" ||
+        SamyangBurstInput === "" || SamyangArrival < 0 || SamyangBurst <= 0) {
         alert("Please enter valid process information.");
         return;
     }
 
-    if (processes.some(p => p.id === id.trim())) {
+    // Check ID
+    if (SamyangProcesses.some(p => p.id === SamyangID.trim())) {
         alert("Process ID already exists.");
         return;
     }
 
-    processes.push({
-        id: id.trim(),
-        arrival: arrival,
-        burst: burst
+    SamyangProcesses.push({
+        id: SamyangID.trim(),
+        arrival: SamyangArrival,
+        burst: SamyangBurst
     });
 
-    displayProcesses();
+    SamyangDisplayProcesses();
 
     document.getElementById("processID").value = "";
     document.getElementById("arrivalTime").value = "";
     document.getElementById("burstTime").value = "";
 }
 
-function displayProcesses() {
-    let table = document.getElementById("processTable");
+// Show processes
+function SamyangDisplayProcesses() {
+    let SamyangTable = document.getElementById("processTable");
 
-    table.innerHTML = "";
+    SamyangTable.innerHTML = "";
 
-    processes.forEach(process => {
-        table.innerHTML += `
-            <tr>
-                <td>${process.id}</td>
-                <td>${process.arrival}</td>
-                <td>${process.burst}</td>
+    SamyangProcesses.forEach(SamyangProcess => {
+        SamyangTable.innerHTML += `
+            <tr class="process-row">
+                <td>${SamyangProcess.id}</td>
+                <td>${SamyangProcess.arrival}</td>
+                <td>${SamyangProcess.burst}</td>
             </tr>
         `;
     });
 }
 
+// Get process color
+function SamyangGetColor(SamyangID) {
+    let SamyangColors = [
+        "#DCCDF5",
+        "#F5D1DF",
+        "#C9E5DC",
+        "#F6DFC0",
+        "#D0DDF5",
+        "#EBD5C8",
+        "#D8DCEB"
+    ];
 
+    let SamyangHash = 0;
+
+    for (let i = 0; i < SamyangID.length; i++) {
+        SamyangHash += SamyangID.charCodeAt(i);
+    }
+
+    return SamyangColors[SamyangHash % SamyangColors.length];
+}
+
+// Run simulation
 function runSimulation() {
+    SamyangRunSimulation();
+}
 
-    if (processes.length === 0) {
+function SamyangRunSimulation() {
+
+    if (SamyangProcesses.length === 0) {
         alert("Please add processes first.");
         return;
     }
 
-    let algorithm = document.getElementById("algorithm").value;
+    let SamyangAlgorithm = document.getElementById("algorithm").value;
 
-    let sortedProcesses = [...processes];
+    let SamyangSorted = [...SamyangProcesses];
 
-    if (algorithm === "fcfs") {
-        sortedProcesses.sort((a, b) => a.arrival - b.arrival);
+    if (SamyangAlgorithm === "fcfs") {
+        SamyangSorted.sort((a, b) => a.arrival - b.arrival);
     }
 
-    let currentTime = 0;
-    let remaining = [...sortedProcesses];
-    let results = [];
-    let gantt = [];
+    let SamyangTime = 0;
+    let SamyangRemaining = [...SamyangSorted];
+    let SamyangResults = [];
+    let SamyangGantt = [];
 
-    while (remaining.length > 0) {
+    while (SamyangRemaining.length > 0) {
 
-        let available = remaining.filter(
-            p => p.arrival <= currentTime
+        let SamyangAvailable = SamyangRemaining.filter(
+            p => p.arrival <= SamyangTime
         );
 
-        // If no process has arrived, move time forward
-        if (available.length === 0) {
+        if (SamyangAvailable.length === 0) {
 
-            let nextArrival = Math.min(
-                ...remaining.map(p => p.arrival)
+            let SamyangNextArrival = Math.min(
+                ...SamyangRemaining.map(p => p.arrival)
             );
 
-            gantt.push({
+            SamyangGantt.push({
                 id: "Idle",
-                start: currentTime,
-                end: nextArrival
+                start: SamyangTime,
+                end: SamyangNextArrival
             });
 
-            currentTime = nextArrival;
+            SamyangTime = SamyangNextArrival;
             continue;
         }
 
-        let selected;
+        let SamyangSelected;
 
-        if (algorithm === "fcfs") {
+        // FCFS
+        if (SamyangAlgorithm === "fcfs") {
 
-            selected = available.sort(
+            SamyangSelected = SamyangAvailable.sort(
                 (a, b) => a.arrival - b.arrival
             )[0];
 
-        } else if (algorithm === "sjf") {
+        // SJF
+        } else if (SamyangAlgorithm === "sjf") {
 
-            selected = available.sort(
+            SamyangSelected = SamyangAvailable.sort(
                 (a, b) => a.burst - b.burst ||
                           a.arrival - b.arrival
             )[0];
         }
 
-        let startTime = currentTime;
-        let completion = currentTime + selected.burst;
+        // Calc times
+        let SamyangStart = SamyangTime;
+        let SamyangCompletion = SamyangTime + SamyangSelected.burst;
 
-        let turnaround = completion - selected.arrival;
-        let waiting = turnaround - selected.burst;
+        let SamyangTurnaround =
+            SamyangCompletion - SamyangSelected.arrival;
 
-        results.push({
-            id: selected.id,
-            arrival: selected.arrival,
-            burst: selected.burst,
-            completion: completion,
-            turnaround: turnaround,
-            waiting: waiting
+        let SamyangWaiting =
+            SamyangTurnaround - SamyangSelected.burst;
+
+        SamyangResults.push({
+            id: SamyangSelected.id,
+            arrival: SamyangSelected.arrival,
+            burst: SamyangSelected.burst,
+            completion: SamyangCompletion,
+            turnaround: SamyangTurnaround,
+            waiting: SamyangWaiting
         });
 
-        gantt.push({
-            id: selected.id,
-            start: startTime,
-            end: completion
+        SamyangGantt.push({
+            id: SamyangSelected.id,
+            start: SamyangStart,
+            end: SamyangCompletion
         });
 
-        currentTime = completion;
+        SamyangTime = SamyangCompletion;
 
-        remaining = remaining.filter(
-            p => p !== selected
+        SamyangRemaining = SamyangRemaining.filter(
+            p => p !== SamyangSelected
         );
     }
 
-    displayGantt(gantt);
-    displayResults(results);
+    SamyangGanttChart(SamyangGantt);
+SamyangDisplayResults(SamyangResults, SamyangGantt);
+
+// SCROLL ZZZ
+setTimeout(() => {
+    let SamyangTarget = document.getElementById("ganttChart");
+
+    let SamyangPosition =
+        SamyangTarget.getBoundingClientRect().top +
+        window.pageYOffset - 100;
+
+    window.scrollTo({
+        top: SamyangPosition,
+        behavior: "smooth"
+    });
+}, 200);
 }
 
-function displayGantt(gantt) {
+// Show Gantt chart
+function SamyangGanttChart(SamyangGantt) {
 
-    let chart = document.getElementById("ganttChart");
-    chart.innerHTML = "";
+    let SamyangChart = document.getElementById("ganttChart");
+    SamyangChart.innerHTML = "";
 
-    gantt.forEach(block => {
+    SamyangGantt.forEach((SamyangBlock, index) => {
 
-        let div = document.createElement("div");
-        div.className = "gantt-block";
+        let SamyangDiv = document.createElement("div");
+        SamyangDiv.className = "gantt-block";
 
-        div.style.flex = block.end - block.start;
+        SamyangDiv.style.flex =
+            SamyangBlock.end - SamyangBlock.start;
 
-        div.innerHTML = `
-            <strong>${block.id}</strong>
+        SamyangDiv.style.animationDelay = `${index * 0.18}s`;
+
+        if (SamyangBlock.id === "Idle") {
+            SamyangDiv.classList.add("idle-block");
+        } else {
+            SamyangDiv.style.backgroundColor =
+                SamyangGetColor(SamyangBlock.id);
+        }
+
+        SamyangDiv.innerHTML = `
+            <strong>${SamyangBlock.id}</strong>
             <div class="gantt-time">
-                ${block.start} - ${block.end}
+                ${SamyangBlock.start} - ${SamyangBlock.end}
             </div>
         `;
 
-        chart.appendChild(div);
+        SamyangChart.appendChild(SamyangDiv);
     });
 }
 
-function displayResults(results) {
+// Show results
+function SamyangDisplayResults(SamyangResults, SamyangGantt) {
 
-    let table = document.getElementById("resultsTable");
-    table.innerHTML = "";
+    let SamyangTable = document.getElementById("resultsTable");
+    SamyangTable.innerHTML = "";
 
-    let totalWaiting = 0;
-    let totalTurnaround = 0;
+    let SamyangTotalWaiting = 0;
+    let SamyangTotalTurnaround = 0;
+    let SamyangTotalBurst = 0;
 
-    results.forEach(process => {
+    SamyangResults.forEach((SamyangProcess, index) => {
 
-        totalWaiting += process.waiting;
-        totalTurnaround += process.turnaround;
+        SamyangTotalWaiting += SamyangProcess.waiting;
+        SamyangTotalTurnaround += SamyangProcess.turnaround;
+        SamyangTotalBurst += SamyangProcess.burst;
 
-        table.innerHTML += `
-            <tr>
-                <td>${process.id}</td>
-                <td>${process.arrival}</td>
-                <td>${process.burst}</td>
-                <td>${process.completion}</td>
-                <td>${process.turnaround}</td>
-                <td>${process.waiting}</td>
-            </tr>
-        `;
+        SamyangTable.innerHTML += `
+    <tr class="result-row" style="animation-delay: ${index * 0.12}s">
+        <td><strong>${SamyangProcess.id}</strong></td>
+        <td>${SamyangProcess.arrival}</td>
+        <td>${SamyangProcess.burst}</td>
+        <td><span class="result-number completion">${SamyangProcess.completion}</span></td>
+        <td><span class="result-number turnaround">${SamyangProcess.turnaround}</span></td>
+        <td><span class="result-number waiting">${SamyangProcess.waiting}</span></td>
+    </tr>
+`;
     });
 
-    let avgWaiting = totalWaiting / results.length;
-    let avgTurnaround = totalTurnaround / results.length;
+    // Get averages
+    let SamyangAvgWaiting =
+        SamyangTotalWaiting / SamyangResults.length;
 
-    document.getElementById("averages").innerHTML =
-        `Average Waiting Time: ${avgWaiting.toFixed(2)}
-         | Average Turnaround Time: ${avgTurnaround.toFixed(2)}`;
+    let SamyangAvgTurnaround =
+        SamyangTotalTurnaround / SamyangResults.length;
+
+    // Get total execution time
+    let SamyangTotalExecution = SamyangTotalBurst;
+
+    document.getElementById("averages").innerHTML = `
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <span>Average Waiting Time</span>
+                <strong>${SamyangAvgWaiting.toFixed(2)}</strong>
+                <small>Time units</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Average Turnaround Time</span>
+                <strong>${SamyangAvgTurnaround.toFixed(2)}</strong>
+                <small>Time units</small>
+            </div>
+
+            <div class="stat-card">
+                <span>Total Execution Time</span>
+                <strong>${SamyangTotalExecution}</strong>
+                <small>CPU busy time units</small>
+            </div>
+
+        </div>
+    `;
+}
+function toggleTheme() {
+    document.body.classList.toggle("dark-mode");
+
+    const button = document.getElementById("themeToggle");
+
+    if (document.body.classList.contains("dark-mode")) {
+        button.textContent = "☀️ Light Mode";
+    } else {
+        button.textContent = "🌙 Dark Mode";
+    }
 }

@@ -9,134 +9,273 @@
 </head>
 <body>
 
-<div class="container">
+<div class="app-container">
 
-    <header class="header">
-        <div>
-            <h1>CPE 312 CPU Scheduling Simulator HAHAHAHAHA</h1>
-            <p>Operating Systems Process Management</p>
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-logo">
+    <img src="logo.png" alt="LOGO Logo">
+</div>
+            <div>
+                <h2>PLACEHOLDERZZ</h2>
+                <span>PROCESS SCHEDULING TOOL</span>
+            </div>
         </div>
-        <span class="status">● Simulator Ready</span>
+
+        <nav class="navigation">
+            <a href="#process-manager">Processes</a>
+            <a href="#scheduling">Scheduling</a>
+            <a href="#timeline">Timeline</a>
+            <a href="#results">Results</a>
+        </nav>
+
+        <div class="header-actions">
+            <span class="system-status">
+                <span class="status-dot"></span>
+                Ready
+            </span>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+                🌙 Dark Mode
+            </button>
+        </div>
     </header>
 
     <main>
 
-        <section class="panel">
-            <h2>01. Process Input</h2>
-            <p class="description">
-                Add processes and specify their scheduling information.
-            </p>
+        <section class="welcome-section">
+            <div class="welcome-text">
+                <span class="eyebrow">OPERATING SYSTEMS PROJECT</span>
+                <h1>CPU Scheduling <span>Simulator.</span></h1>
+                <p>
+                    Organize your processes, choose a scheduling method,
+                    and see how your CPU handles each task.
+                </p>
+            </div>
 
-            <div class="input-grid">
-                <div class="input-group">
-                    <label for="processID">Process ID</label>
-                    <input type="text" id="processID" placeholder="e.g. P1">
-                </div>
-
-                <div class="input-group">
-                    <label for="arrivalTime">Arrival Time</label>
-                    <input type="number" id="arrivalTime" min="0" placeholder="e.g. 0">
-                </div>
-
-                <div class="input-group">
-                    <label for="burstTime">Burst Time</label>
-                    <input type="number" id="burstTime" min="1" placeholder="e.g. 5">
+            <div class="welcome-decoration">
+                <div class="decoration-circle circle-one"></div>
+                <div class="decoration-circle circle-two"></div>
+                <div class="decoration-card">
+                    <span>CPU</span>
+                    <strong>01</strong>
+                    <small>PROCESS LAB</small>
                 </div>
             </div>
-
-            <button class="primary-button" onclick="addProcess()">
-                + Add Process
-            </button>
         </section>
 
-        <section class="panel">
-            <h2>02. Process List</h2>
-            <p class="description">
-                Review all processes added to the simulator.
-            </p>
+        <section id="process-manager" class="workspace-section">
+            <div class="section-heading">
+                <div>
+                    <span class="section-label">01 — GET STARTED</span>
+                    <h2>Process Manager</h2>
+                    <p>Add your processes and organize the queue.</p>
+                </div>
+                <span class="section-mark">01</span>
+            </div>
 
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Process ID</th>
-                            <th>Arrival Time</th>
-                            <th>Burst Time</th>
-                        </tr>
-                    </thead>
-                    <tbody id="processTable"></tbody>
-                </table>
+            <div class="process-layout">
+
+                <div class="card input-card">
+                    <div class="card-title">
+                        <div class="icon-box pink">+</div>
+                        <div>
+                            <h3>Add a Process</h3>
+                            <p>Enter the process information.</p>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="processID">Process ID</label>
+                        <input type="text" id="processID" placeholder="Example: P1">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="arrivalTime">Arrival Time</label>
+                        <input type="number" id="arrivalTime" min="0" placeholder="Example: 0">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="burstTime">Burst Time</label>
+                        <input type="number" id="burstTime" min="1" placeholder="Example: 5">
+                    </div>
+
+                    <button class="primary-button" onclick="addProcess()">
+                        <span>+</span> Add to Queue
+                    </button>
+                </div>
+
+                <div class="card queue-card">
+                    <div class="card-title">
+                        <div class="icon-box lavender">≡</div>
+                        <div>
+                            <h3>Process Queue</h3>
+                            <p>Your registered processes appear here.</p>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>PROCESS ID</th>
+                                    <th>ARRIVAL</th>
+                                    <th>BURST</th>
+                                </tr>
+                            </thead>
+                            <tbody id="processTable"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-note">
+                        <span>✦</span> Processes are listed as they are added.
+                    </div>
+                </div>
+
             </div>
         </section>
 
-        <section class="panel">
-            <h2>03. Scheduling Configuration</h2>
-            <p class="description">
-                Choose an algorithm to simulate.
-            </p>
-
-            <div class="input-group">
-                <label for="algorithm">Scheduling Algorithm</label>
-
-                <select id="algorithm">
-                    <option value="fcfs">
-                        First Come, First Served (FCFS)
-                    </option>
-                    <option value="sjf">
-                        Shortest Job First (SJF)
-                    </option>
-                </select>
+        <section id="scheduling" class="workspace-section">
+            <div class="section-heading">
+                <div>
+                    <span class="section-label">02 — CHOOSE YOUR METHOD</span>
+                    <h2>Scheduling Setup</h2>
+                    <p>Select the algorithm for your simulation.</p>
+                </div>
+                <span class="section-mark">02</span>
             </div>
 
-            <button class="primary-button run-button"
-                    onclick="runSimulation()">
-                Run Simulation →
-            </button>
+            <div class="card scheduling-card">
+                <div class="scheduling-left">
+                    <div class="card-title">
+                        <div class="icon-box lavender">⌘</div>
+                        <div>
+                            <h3>Scheduling Algorithm</h3>
+                            <p>Choose how processes will be executed.</p>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="algorithm">Select Algorithm</label>
+                        <select id="algorithm">
+                            <option value="fcfs">First Come, First Served (FCFS)</option>
+                            <option value="sjf">Shortest Job First (SJF)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="scheduling-right">
+                    <span class="tip-label">A QUICK NOTE</span>
+                    <h3>How should the CPU work?</h3>
+                    <p>
+                        FCFS follows the order of arrival.
+                        SJF chooses the shortest available process first.
+                    </p>
+                    <button class="run-button" onclick="runSimulation()">
+                        Run Simulation <span>→</span>
+                    </button>
+                </div>
+            </div>
         </section>
 
-        <section class="panel">
-            <h2>04. Gantt Chart</h2>
-            <p class="description">
-                Visual representation of CPU process execution.
-            </p>
-
-            <div id="ganttChart" class="gantt-chart"></div>
-        </section>
-
-        <section class="panel">
-            <h2>05. Scheduling Results</h2>
-            <p class="description">
-                View the calculated scheduling times for each process.
-            </p>
-
-            <div class="table-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Process</th>
-                            <th>Arrival</th>
-                            <th>Burst</th>
-                            <th>Completion</th>
-                            <th>Turnaround</th>
-                            <th>Waiting</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultsTable"></tbody>
-                </table>
+        <section id="timeline" class="workspace-section">
+            <div class="section-heading">
+                <div>
+                    <span class="section-label">03 — VISUALIZE EXECUTION</span>
+                    <h2>Execution Timeline</h2>
+                    <p>See how each process occupies the CPU.</p>
+                </div>
+                <span class="section-mark">03</span>
             </div>
 
-            <div id="averages" class="average-results"></div>
+            <div class="card timeline-card">
+                <div class="card-title">
+                    <div class="icon-box pink">▥</div>
+                    <div>
+                        <h3>Gantt Chart</h3>
+                        <p>Process execution in chronological order.</p>
+                    </div>
+                </div>
+
+                <div id="ganttChart" class="gantt-chart">
+                    <p class="placeholder">Your Gantt chart will appear here after the simulation.</p>
+                </div>
+
+                <div class="timeline-note">
+                    <span class="legend-dot"></span>
+                    Each block represents a process or CPU idle time.
+                </div>
+            </div>
+        </section>
+
+        <section id="results" class="workspace-section">
+            <div class="section-heading">
+                <div>
+                    <span class="section-label">04 — FINAL ANALYSIS</span>
+                    <h2>Scheduling Results</h2>
+                    <p>Review the calculated times and performance.</p>
+                </div>
+                <span class="section-mark">04</span>
+            </div>
+
+            <div class="card results-card">
+                <div class="card-title">
+                    <div class="icon-box lavender">✧</div>
+                    <div>
+                        <h3>Process Performance</h3>
+                        <p>Scheduling calculations for each process.</p>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>PROCESS</th>
+                                <th>ARRIVAL</th>
+                                <th>BURST</th>
+                                <th>COMPLETION</th>
+                                <th>TURNAROUND</th>
+                                <th>WAITING</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTable"></tbody>
+                    </table>
+                </div>
+
+                <div class="average-results" id="averages"></div>
+            </div>
         </section>
 
     </main>
 
     <footer>
-        CPU Scheduling Simulator | Operating Systems Project
+        <div class="footer-line"></div>
+        <p>MADE FOR OPERATING SYSTEMS</p>
+        <span>CPU Scheduling Simulator · Academic Project</span>
     </footer>
 
 </div>
 
 <script src="script.js"></script>
+
+<script>
+    function toggleTheme() {
+        document.body.classList.toggle("dark-mode");
+
+        const isDark = document.body.classList.contains("dark-mode");
+        const button = document.getElementById("themeToggle");
+
+        button.textContent = isDark ? "☀️ Light Mode" : "🌙 Dark Mode";
+
+        localStorage.setItem("cpuTheme", isDark ? "dark" : "light");
+    }
+
+    // Load saved theme
+    if (localStorage.getItem("cpuTheme") === "dark") {
+        document.body.classList.add("dark-mode");
+        document.getElementById("themeToggle").textContent = "☀️ Light Mode";
+    }
+</script>
 
 </body>
 </html>
