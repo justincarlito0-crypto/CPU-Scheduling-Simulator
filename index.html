@@ -1,262 +1,154 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPU Scheduling Simulator</title>
+    <title>PLACEHOLDER | CPU Scheduling</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="app-container">
-
     <header class="topbar">
-        <div class="brand">
-            <div class="brand-logo">
-                <img src="logo.png" alt="Project Logo">
-            </div>
-            <div>
-                <h2>PLACEHOLDERZZ</h2>
-                <span>PROCESS SCHEDULING TOOL</span>
-            </div>
-        </div>
+        <a href="index.html" class="brand">
+            <span class="brand-icon">P</span>
+            <span>PLACEHOLDER</span>
+        </a>
 
-        <nav class="navigation">
-            <a href="#process-manager">Processes</a>
-            <a href="#scheduling">Scheduling</a>
-            <a href="#timeline">Timeline</a>
-            <a href="#results">Results</a>
-        </nav>
-
-        <div class="header-actions">
-            <span class="system-status">
-                <span class="status-dot"></span>
-                Ready
-            </span>
-            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
-                🌙 Dark Mode
-            </button>
-        </div>
+        <button id="themeToggle" class="theme-toggle">☀</button>
     </header>
 
-    <main>
+    <main class="home-container">
 
-        <section class="welcome-section">
-            <div class="welcome-text">
-                <span class="eyebrow">OPERATING SYSTEMS PROJECT</span>
-                <h1>CPU Scheduling <span>Simulator.</span></h1>
-                <p>
-                    Organize your processes, choose a scheduling method,
-                    and see how your CPU handles each task.
-                </p>
+        <section class="hero">
+            <div class="hero-label">
+                <span class="pulse-dot"></span>
+                OPERATING SYSTEMS PROJECT
             </div>
 
-            <div class="welcome-decoration">
-                <div class="decoration-circle circle-one"></div>
-                <div class="decoration-circle circle-two"></div>
-                <div class="decoration-card">
+            <h1>
+                CPU Scheduling<br>
+                <span class="gradient-text">Simulator.</span>
+            </h1>
+
+            <p>
+                Explore CPU scheduling algorithms through an interactive
+                simulation. Configure processes, run algorithms, and
+                compare their performance.
+            </p>
+
+            <div class="hero-decoration">
+                <div class="cpu-chip">
                     <span>CPU</span>
-                    <strong>01</strong>
-                    <small>PROCESS LAB</small>
+                    <div class="cpu-bars">
+                        <i></i><i></i><i></i><i></i><i></i>
+                    </div>
                 </div>
+                <div class="orbit orbit-one"></div>
+                <div class="orbit orbit-two"></div>
+                <span class="floating-dot dot-one"></span>
+                <span class="floating-dot dot-two"></span>
+                <span class="floating-dot dot-three"></span>
             </div>
         </section>
 
-        <section id="process-manager" class="workspace-section">
+        <section class="algorithm-section">
             <div class="section-heading">
                 <div>
-                    <span class="section-label">01 — GET STARTED</span>
-                    <h2>Process Manager</h2>
-                    <p>Add your processes and organize the queue.</p>
+                    <span class="eyebrow">GET STARTED</span>
+                    <h2>Choose an algorithm</h2>
                 </div>
-                <span class="section-mark">01</span>
+                <span class="algorithm-count">03 ALGORITHMS</span>
             </div>
 
-            <div class="process-layout">
+            <div class="algorithm-grid">
 
-                <div class="card input-card">
-                    <div class="card-title">
-                        <div class="icon-box pink">+</div>
-                        <div>
-                            <h3>Add a Process</h3>
-                            <p>Enter the process information.</p>
-                        </div>
+                <a href="simulator.html?algorithm=fcfs" class="algorithm-card fcfs-card">
+                    <div class="card-top">
+                        <span class="algorithm-number">01</span>
+                        <span class="card-arrow">↗</span>
                     </div>
-
-                    <div class="input-group">
-                        <label for="processID">Process ID</label>
-                        <input type="text" id="processID" placeholder="Example: P1">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="arrivalTime">Arrival Time</label>
-                        <input type="number" id="arrivalTime" min="0" placeholder="Example: 0">
-                    </div>
-
-                    <div class="input-group">
-                        <label for="burstTime">Burst Time</label>
-                        <input type="number" id="burstTime" min="1" placeholder="Example: 5">
-                    </div>
-
-                    <button class="primary-button" onclick="addProcess()">
-                        <span>+</span> Add to Queue
-                    </button>
-                </div>
-
-                <div class="card queue-card">
-                    <div class="card-title">
-                        <div class="icon-box lavender">≡</div>
-                        <div>
-                            <h3>Process Queue</h3>
-                            <p>Your registered processes appear here.</p>
-                        </div>
-                    </div>
-
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>PROCESS ID</th>
-                                    <th>ARRIVAL</th>
-                                    <th>BURST</th>
-                                </tr>
-                            </thead>
-                            <tbody id="processTable"></tbody>
-                        </table>
-                    </div>
-
-                    <div class="table-note">
-                        <span>✦</span> Processes are listed as they are added.
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <section id="scheduling" class="workspace-section">
-            <div class="section-heading">
-                <div>
-                    <span class="section-label">02 — CHOOSE YOUR METHOD</span>
-                    <h2>Scheduling Setup</h2>
-                    <p>Select the algorithm for your simulation.</p>
-                </div>
-                <span class="section-mark">02</span>
-            </div>
-
-            <div class="card scheduling-card">
-                <div class="scheduling-left">
-                    <div class="card-title">
-                        <div class="icon-box lavender">⌘</div>
-                        <div>
-                            <h3>Scheduling Algorithm</h3>
-                            <p>Choose how processes will be executed.</p>
-                        </div>
-                    </div>
-
-                    <div class="input-group">
-                        <label for="algorithm">Select Algorithm</label>
-                        <select id="algorithm">
-                            <option value="fcfs">First Come, First Served (FCFS)</option>
-                            <option value="sjf">Shortest Job First (SJF)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="scheduling-right">
-                    <span class="tip-label">A QUICK NOTE</span>
-                    <h3>How should the CPU work?</h3>
+                    <div class="algorithm-icon">⏱</div>
+                    <h3>First Come, First Served</h3>
                     <p>
-                        FCFS follows the order of arrival.
-                        SJF chooses the shortest available process first.
+                        Processes are executed in the order they arrive
+                        in the ready queue.
                     </p>
-                    <button class="run-button" onclick="runSimulation()">
-                        Run Simulation <span>→</span>
-                    </button>
-                </div>
+                    <div class="card-tags">
+                        <span>Non-preemptive</span>
+                        <span>Arrival order</span>
+                    </div>
+                    <div class="card-action">START SIMULATION <span>→</span></div>
+                </a>
+
+                <a href="simulator.html?algorithm=sjf" class="algorithm-card sjf-card">
+                    <div class="card-top">
+                        <span class="algorithm-number">02</span>
+                        <span class="card-arrow">↗</span>
+                    </div>
+                    <div class="algorithm-icon">⚡</div>
+                    <h3>Shortest Job First</h3>
+                    <p>
+                        The available process with the shortest burst
+                        time is executed first.
+                    </p>
+                    <div class="card-tags">
+                        <span>Non-preemptive</span>
+                        <span>Burst time</span>
+                    </div>
+                    <div class="card-action">START SIMULATION <span>→</span></div>
+                </a>
+
+                <a href="simulator.html?algorithm=priority" class="algorithm-card priority-card">
+                    <div class="card-top">
+                        <span class="algorithm-number">03</span>
+                        <span class="card-arrow">↗</span>
+                    </div>
+                    <div class="algorithm-icon">✦</div>
+                    <h3>Priority Scheduling</h3>
+                    <p>
+                        The available process with the highest priority
+                        is selected first.
+                    </p>
+                    <div class="card-tags">
+                        <span>Non-preemptive</span>
+                        <span>Priority number</span>
+                    </div>
+                    <div class="card-action">START SIMULATION <span>→</span></div>
+                </a>
+
             </div>
         </section>
 
-        <section id="timeline" class="workspace-section">
-            <div class="section-heading">
+        <section class="info-strip">
+            <div>
+                <span class="info-icon">⌁</span>
                 <div>
-                    <span class="section-label">03 — VISUALIZE EXECUTION</span>
-                    <h2>Execution Timeline</h2>
-                    <p>See how each process occupies the CPU.</p>
-                </div>
-                <span class="section-mark">03</span>
-            </div>
-
-            <div class="card timeline-card">
-                <div class="card-title">
-                    <div class="icon-box pink">▥</div>
-                    <div>
-                        <h3>Gantt Chart</h3>
-                        <p>Process execution in chronological order.</p>
-                    </div>
-                </div>
-
-                <div id="ganttChart" class="gantt-chart">
-                    <p class="placeholder">Your Gantt chart will appear here after the simulation.</p>
-                </div>
-
-                <div class="timeline-note">
-                    <span class="legend-dot"></span>
-                    Each block represents a process or CPU idle time.
+                    <strong>Interactive Gantt Chart</strong>
+                    <p>Visualize process execution order.</p>
                 </div>
             </div>
-        </section>
-
-        <section id="results" class="workspace-section">
-            <div class="section-heading">
+            <div>
+                <span class="info-icon pink-icon">◈</span>
                 <div>
-                    <span class="section-label">04 — FINAL ANALYSIS</span>
-                    <h2>Scheduling Results</h2>
-                    <p>Review the calculated times and performance.</p>
+                    <strong>Performance Analysis</strong>
+                    <p>Compare waiting and turnaround times.</p>
                 </div>
-                <span class="section-mark">04</span>
             </div>
-
-            <div class="card results-card">
-                <div class="card-title">
-                    <div class="icon-box lavender">✧</div>
-                    <div>
-                        <h3>Process Performance</h3>
-                        <p>Scheduling calculations for each process.</p>
-                    </div>
+            <div>
+                <span class="info-icon cyan-icon">⌘</span>
+                <div>
+                    <strong>Simple Simulation</strong>
+                    <p>Configure and run your own processes.</p>
                 </div>
-
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>PROCESS</th>
-                                <th>ARRIVAL</th>
-                                <th>BURST</th>
-                                <th>COMPLETION</th>
-                                <th>TURNAROUND</th>
-                                <th>WAITING</th>
-                            </tr>
-                        </thead>
-                        <tbody id="resultsTable"></tbody>
-                    </table>
-                </div>
-
-                <div class="average-results" id="averages"></div>
             </div>
         </section>
 
     </main>
 
-    <footer>
-        <div class="footer-line"></div>
-        <p>MADE FOR OPERATING SYSTEMS</p>
-        <span>CPU Scheduling Simulator · Academic Project</span>
+    <footer class="footer">
+        PLACEHOLDER <span>•</span> CPU SCHEDULING SIMULATOR
     </footer>
 
-</div>
-
-<script src="script.js"></script>
-
+    <script src="script.js"></script>
 </body>
 </html>

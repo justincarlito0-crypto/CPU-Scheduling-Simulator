@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLACEHOLDER | Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header class="topbar">
+        <a href="index.html" class="brand">
+            <span class="brand-icon">P</span>
+            <span>PLACEHOLDER</span>
+        </a>
+
+        <div class="topbar-right">
+            <a href="index.html" class="back-home">← Home</a>
+            <button id="themeToggle" class="theme-toggle">☀</button>
+        </div>
+    </header>
+
+    <main class="simulator-container">
+
+        <!-- SIMULATOR VIEW -->
+        <section id="simulatorView" class="page-view">
+
+            <div class="page-heading">
+                <div>
+                    <span class="eyebrow">CPU SCHEDULING / SIMULATOR</span>
+                    <h1 id="algorithmTitle">First Come, First Served</h1>
+                    <p id="algorithmDescription">
+                        Processes are executed in the order they arrive.
+                    </p>
+                </div>
+                <div class="algorithm-badge" id="selectedAlgorithm">FCFS</div>
+            </div>
+
+            <div class="simulator-layout">
+
+                <section class="panel process-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <span class="eyebrow">CONFIGURATION</span>
+                            <h2>Process Management</h2>
+                        </div>
+                        <span class="process-counter" id="processCount">0 PROCESSES</span>
+                    </div>
+
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label for="processID">Process ID</label>
+                            <input type="text" id="processID" placeholder="e.g. P1">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="arrivalTime">Arrival Time</label>
+                            <input type="number" id="arrivalTime" min="0" placeholder="e.g. 0">
+                        </div>
+
+                        <div class="input-group">
+                            <label for="burstTime">Burst Time</label>
+                            <input type="number" id="burstTime" min="1" placeholder="e.g. 5">
+                        </div>
+
+                        <div class="input-group hidden" id="priorityGroup">
+                            <label for="priority">Priority</label>
+                            <input type="number" id="priority" min="1" placeholder="e.g. 1">
+                        </div>
+                    </div>
+
+                    <button id="addProcessButton" class="primary-button">
+                        <span>＋</span> Add Process
+                    </button>
+
+                    <div class="table-heading">
+                        <h3>Process Queue</h3>
+                        <button id="clearProcessesButton" class="text-button">
+                            Clear All
+                        </button>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Process</th>
+                                    <th>Arrival</th>
+                                    <th>Burst</th>
+                                    <th class="priority-column hidden">Priority</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="processTable">
+                                <tr>
+                                    <td colspan="5" class="empty-table">
+                                        No processes added yet.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="panel-note">
+                        <span>ⓘ</span>
+                        Add at least one process before running the simulation.
+                    </div>
+
+                    <button id="runSimulationButton" class="run-button">
+                        RUN SIMULATION <span>→</span>
+                    </button>
+                </section>
+
+                <aside class="side-panel">
+                    <div class="panel side-info">
+                        <span class="eyebrow">ALGORITHM DETAILS</span>
+                        <div class="side-algorithm-icon" id="sideAlgorithmIcon">⏱</div>
+                        <h3 id="sideAlgorithmName">FCFS</h3>
+                        <p id="sideAlgorithmText">
+                            First Come, First Served selects processes based on arrival time.
+                        </p>
+                        <div class="side-divider"></div>
+                        <div class="detail-row">
+                            <span>Scheduling type</span>
+                            <strong>Non-preemptive</strong>
+                        </div>
+                        <div class="detail-row">
+                            <span>Selection method</span>
+                            <strong id="selectionMethod">Arrival time</strong>
+                        </div>
+                    </div>
+
+                    <div class="tip-card">
+                        <span>✦ QUICK TIP</span>
+                        <p id="sideTip">
+                            If two processes arrive at the same time, the one added first is selected first.
+                        </p>
+                    </div>
+                </aside>
+
+            </div>
+        </section>
+
+        <!-- RESULTS VIEW -->
+        <section id="resultsView" class="page-view hidden">
+
+            <div class="results-heading">
+                <div>
+                    <span class="eyebrow">SIMULATION / RESULTS</span>
+                    <h1>Simulation <span class="gradient-text">Complete.</span></h1>
+                    <p>Your CPU scheduling results are ready.</p>
+                </div>
+                <div class="completed-badge">
+                    <span class="pulse-dot"></span> COMPLETED
+                </div>
+            </div>
+
+            <div class="results-toolbar">
+                <div>
+                    <span class="eyebrow">SELECTED ALGORITHM</span>
+                    <h2 id="resultsAlgorithm">FCFS</h2>
+                </div>
+                <button id="backToSimulatorButton" class="secondary-button">
+                    ← Back to Simulator
+                </button>
+            </div>
+
+            <section class="stats-grid">
+                <div class="stat-card stat-pink">
+                    <span class="stat-label">AVERAGE WAITING TIME</span>
+                    <strong class="stat-value" id="averageWaiting">0.00</strong>
+                    <span class="stat-description">Time units</span>
+                </div>
+
+                <div class="stat-card stat-purple">
+                    <span class="stat-label">AVERAGE TURNAROUND TIME</span>
+                    <strong class="stat-value" id="averageTurnaround">0.00</strong>
+                    <span class="stat-description">Time units</span>
+                </div>
+
+                <div class="stat-card stat-cyan">
+                    <span class="stat-label">TOTAL CPU BURST TIME</span>
+                    <strong class="stat-value" id="totalBurst">0</strong>
+                    <span class="stat-description">CPU busy time units</span>
+                </div>
+            </section>
+
+            <section class="panel result-panel">
+                <div class="panel-heading">
+                    <div>
+                        <span class="eyebrow">VISUALIZATION</span>
+                        <h2>Gantt Chart</h2>
+                    </div>
+                    <span class="chart-legend">
+                        <span class="legend-dot"></span> Process
+                        <span class="legend-idle"></span> Idle
+                    </span>
+                </div>
+
+                <div id="ganttChart" class="gantt-chart"></div>
+            </section>
+
+            <section class="panel result-panel">
+                <div class="panel-heading">
+                    <div>
+                        <span class="eyebrow">PROCESS ANALYSIS</span>
+                        <h2>Execution Results</h2>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Process</th>
+                                <th>Arrival Time</th>
+                                <th>Burst Time</th>
+                                <th>Completion Time</th>
+                                <th>Turnaround Time</th>
+                                <th>Waiting Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTable"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <div class="results-bottom">
+                <p>Simulation finished successfully.</p>
+                <button id="runAgainButton" class="primary-button">
+                    RUN AGAIN ↻
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        PLACEHOLDER <span>•</span> CPU SCHEDULING SIMULATOR
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
