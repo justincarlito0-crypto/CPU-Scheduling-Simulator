@@ -3,6 +3,7 @@
 let SamyangProcesses = JSON.parse(localStorage.getItem("cpuLabProcesses")) || [];
 let SamyangSchedule = [];
 let SamyangResults = [];
+let SamyangEditingProcessIndex = null;
 
 const SamyangAlgorithm =
     new URLSearchParams(window.location.search).get("algorithm") || "fcfs";
@@ -94,7 +95,7 @@ function SamyangSetupHomePage() {
     const backButton = document.getElementById("backToWelcomeButton");
     const algorithmCards = document.querySelectorAll(".algorithm-card");
 
-    // OPEN ALGORITHM SELECTION DIRECTLY WHEN RETURNING FROM RESULTS
+    // OPEN ALGORITHM SELECTION DIRECTLY WHEN RETURNING FROM SIMULATOR
 
     const parameters = new URLSearchParams(window.location.search);
     const openSelection = parameters.get("select") === "1";
@@ -173,7 +174,6 @@ function SamyangCreateMessagePopup() {
                 class="message-button">
                 Okay
             </button>
-
         </div>
     `;
 
@@ -248,7 +248,6 @@ function SamyangAddProcess() {
                 "Priority Required",
                 "Please enter a priority value."
             );
-
             priorityInput.focus();
             return;
         }
@@ -260,7 +259,6 @@ function SamyangAddProcess() {
                 "Invalid Priority",
                 "Please enter a valid priority number."
             );
-
             priorityInput.focus();
             return;
         }
@@ -297,7 +295,6 @@ function SamyangAddProcess() {
             "Invalid Process Values",
             "Arrival time must be 0 or higher, and burst time must be greater than 0."
         );
-
         return;
     }
 
@@ -312,7 +309,6 @@ function SamyangAddProcess() {
             "Duplicate Process ID",
             "That Process ID already exists."
         );
-
         idInput.focus();
         return;
     }
@@ -346,12 +342,128 @@ function SamyangAddProcess() {
 window.addProcess = SamyangAddProcess;
 
 
+// EDIT PROCESS
+
+function SamyangEditProcess(index) {
+    if (index < 0 || index >= SamyangProcesses.length) return;
+
+    SamyangEditingProcessIndex = index;
+    SamyangRenderProcessTable();
+
+    const idInput = document.getElementById(`editProcessID-${index}`);
+
+    if (idInput) {
+        idInput.focus();
+        idInput.select();
+    }
+}
+
+function SamyangSaveProcessEdit(index) {
+    if (index < 0 || index >= SamyangProcesses.length) return;
+
+    const idInput = document.getElementById(`editProcessID-${index}`);
+    const arrivalInput = document.getElementById(`editArrivalTime-${index}`);
+    const burstInput = document.getElementById(`editBurstTime-${index}`);
+    const priorityInput = document.getElementById(`editPriority-${index}`);
+
+    if (!idInput || !arrivalInput || !burstInput) return;
+
+    const id = idInput.value.trim();
+    const arrivalText = arrivalInput.value.trim();
+    const burstText = burstInput.value.trim();
+    const arrival = Number(arrivalText);
+    const burst = Number(burstText);
+
+    if (id === "" || arrivalText === "" || burstText === "") {
+        SamyangShowMessage(
+            "Missing Information",
+            "Please complete all process fields before saving."
+        );
+        return;
+    }
+
+    if (
+        !Number.isFinite(arrival) ||
+        !Number.isFinite(burst) ||
+        arrival < 0 ||
+        burst <= 0
+    ) {
+        SamyangShowMessage(
+            "Invalid Process Values",
+            "Arrival time must be 0 or higher, and burst time must be greater than 0."
+        );
+        return;
+    }
+
+    // CHECK DUPLICATE ID
+
+    const duplicate = SamyangProcesses.some((process, processIndex) =>
+        processIndex !== index &&
+        process.id.toLowerCase() === id.toLowerCase()
+    );
+
+    if (duplicate) {
+        SamyangShowMessage(
+            "Duplicate Process ID",
+            "Another process already uses that Process ID."
+        );
+        idInput.focus();
+        return;
+    }
+
+    let priority = SamyangProcesses[index].priority ?? 0;
+
+    if (SamyangAlgorithm === "priority") {
+        const priorityText = priorityInput ? priorityInput.value.trim() : "";
+
+        if (priorityText === "" || !Number.isFinite(Number(priorityText))) {
+            SamyangShowMessage(
+                "Invalid Priority",
+                "Please enter a valid priority number."
+            );
+            if (priorityInput) priorityInput.focus();
+            return;
+        }
+
+        priority = Number(priorityText);
+    }
+
+    // SAVE CHANGES
+
+    SamyangProcesses[index] = {
+        ...SamyangProcesses[index],
+        id: id,
+        arrival: arrival,
+        burst: burst,
+        priority: priority
+    };
+
+    SamyangEditingProcessIndex = null;
+    SamyangSaveProcesses();
+    SamyangRenderProcessTable();
+}
+
+function SamyangCancelProcessEdit() {
+    SamyangEditingProcessIndex = null;
+    SamyangRenderProcessTable();
+}
+
+
 // REMOVE PROCESS
 
 function SamyangRemoveProcess(index) {
     if (index < 0 || index >= SamyangProcesses.length) return;
 
     SamyangProcesses.splice(index, 1);
+
+    if (SamyangEditingProcessIndex === index) {
+        SamyangEditingProcessIndex = null;
+    } else if (
+        SamyangEditingProcessIndex !== null &&
+        SamyangEditingProcessIndex > index
+    ) {
+        SamyangEditingProcessIndex--;
+    }
 
     SamyangProcesses.forEach((process, i) => {
         process.order = i;
@@ -390,7 +502,6 @@ function SamyangCreateClearPopup() {
             </p>
 
             <div class="confirm-actions">
-
                 <button type="button"
                     id="cancelClearButton"
                     class="confirm-button">
@@ -402,7 +513,6 @@ function SamyangCreateClearPopup() {
                     class="confirm-button confirm-danger">
                     Clear All
                 </button>
-
             </div>
 
         </div>
@@ -431,7 +541,6 @@ function SamyangOpenClearPopup() {
     if (!popup) return;
 
     popup.classList.remove("hidden");
-
     document.getElementById("cancelClearButton").focus();
 }
 
@@ -445,10 +554,10 @@ function SamyangCloseClearPopup() {
 
 function SamyangConfirmClearProcesses() {
     SamyangProcesses = [];
+    SamyangEditingProcessIndex = null;
 
     SamyangSaveProcesses();
     SamyangRenderProcessTable();
-
     SamyangCloseClearPopup();
 }
 
@@ -500,24 +609,75 @@ function SamyangRenderProcessTable() {
         header.classList.toggle("hidden", !isPriority);
     });
 
+    if (
+        SamyangEditingProcessIndex !== null &&
+        !SamyangProcesses[SamyangEditingProcessIndex]
+    ) {
+        SamyangEditingProcessIndex = null;
+    }
+
     SamyangProcesses.forEach((process, index) => {
         const row = document.createElement("tr");
 
-        row.innerHTML = `
-            <td>${SamyangEscapeHTML(process.id)}</td>
-            <td>${process.arrival}</td>
-            <td>${process.burst}</td>
-            <td class="${isPriority ? "" : "hidden"}">
-                ${process.priority ?? 0}
-            </td>
-            <td>
-                <button type="button"
-                    class="text-button danger-text"
-                    onclick="SamyangRemoveProcess(${index})">
-                    Remove
-                </button>
-            </td>
-        `;
+        if (SamyangEditingProcessIndex === index) {
+            row.className = "editing-row";
+
+            row.innerHTML = `
+                <td>
+                    <input class="table-edit-input" type="text"
+                        id="editProcessID-${index}"
+                        value="${SamyangEscapeHTML(process.id)}"
+                        aria-label="Edit process ID">
+                </td>
+
+                <td>
+                    <input class="table-edit-input" type="number" min="0" step="any"
+                        id="editArrivalTime-${index}"
+                        value="${process.arrival}"
+                        aria-label="Edit arrival time in milliseconds">
+                </td>
+
+                <td>
+                    <input class="table-edit-input" type="number" min="0.01" step="any"
+                        id="editBurstTime-${index}"
+                        value="${process.burst}"
+                        aria-label="Edit burst time in milliseconds">
+                </td>
+
+                <td class="${isPriority ? "" : "hidden"}">
+                    <input class="table-edit-input" type="number" step="any"
+                        id="editPriority-${index}"
+                        value="${process.priority ?? 0}"
+                        aria-label="Edit priority">
+                </td>
+
+                <td>
+                    <div class="table-actions">
+                        <button type="button" class="text-button save-edit-button"
+                            onclick="SamyangSaveProcessEdit(${index})">Save</button>
+                        <button type="button" class="text-button cancel-edit-button"
+                            onclick="SamyangCancelProcessEdit()">Cancel</button>
+                    </div>
+                </td>
+            `;
+        } else {
+            row.innerHTML = `
+                <td>${SamyangEscapeHTML(process.id)}</td>
+                <td>${process.arrival}</td>
+                <td>${process.burst}</td>
+                <td class="${isPriority ? "" : "hidden"}">
+                    ${process.priority ?? 0}
+                </td>
+                <td>
+                    <div class="table-actions">
+                        <button type="button" class="text-button edit-process-button"
+                            onclick="SamyangEditProcess(${index})">Edit</button>
+                        <button type="button" class="text-button danger-text"
+                            onclick="SamyangRemoveProcess(${index})">Remove</button>
+                    </div>
+                </td>
+            `;
+        }
 
         tableBody.appendChild(row);
     });
@@ -630,12 +790,19 @@ function SamyangCalculateResults() {
 // RUN SIMULATION
 
 function SamyangRunSimulation() {
+    if (SamyangEditingProcessIndex !== null) {
+        SamyangShowMessage(
+            "Finish Editing First",
+            "Please save or cancel your process edit before running the simulation."
+        );
+        return;
+    }
+
     if (SamyangProcesses.length === 0) {
         SamyangShowMessage(
             "No Processes Added",
             "Please add at least one process before running the simulation."
         );
-
         return;
     }
 
@@ -644,7 +811,6 @@ function SamyangRunSimulation() {
         () => {
             SamyangScheduleProcesses(SamyangAlgorithm);
             SamyangCalculateResults();
-
             SamyangDisplaySimulatorResults(SamyangAlgorithm);
 
             const simulatorView = document.getElementById("simulatorView");
@@ -659,7 +825,6 @@ function SamyangRunSimulation() {
             }
 
             window.scrollTo({ top: 0, behavior: "smooth" });
-
             SamyangHideLoading();
         }
     );
@@ -782,7 +947,6 @@ function SamyangRenderGanttChart() {
         } else {
             block.className =
                 `gantt-block process-${processColorIndex % 6}`;
-
             processColorIndex++;
         }
 
@@ -795,11 +959,10 @@ function SamyangRenderGanttChart() {
 
         const time = document.createElement("div");
         time.className = "gantt-time";
-        time.textContent = `${item.start} - ${item.end}`;
+        time.textContent = `${item.start} - ${item.end} ms`;
 
         block.appendChild(processName);
         block.appendChild(time);
-
         chart.appendChild(block);
     });
 }
@@ -897,6 +1060,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const clearButton = document.getElementById("clearProcessesButton");
     const runAgainButton = document.getElementById("runAgainButton");
     const chooseAlgorithmButton = document.getElementById("chooseAlgorithmButton");
+    const backToAlgorithmSelectionButton = document.getElementById("backToAlgorithmSelectionButton");
 
     if (addButton) {
         addButton.onclick = SamyangAddProcess;
@@ -916,6 +1080,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (chooseAlgorithmButton) {
         chooseAlgorithmButton.onclick = SamyangGoToAlgorithmSelection;
+    }
+
+    if (backToAlgorithmSelectionButton) {
+        backToAlgorithmSelectionButton.onclick = SamyangGoToAlgorithmSelection;
     }
 
     SamyangRenderProcessTable();

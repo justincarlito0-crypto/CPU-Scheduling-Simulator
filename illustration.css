@@ -7,18 +7,14 @@
     top: 50%;
     right: 5%;
     transform: translateY(-50%);
-
     width: 290px;
     height: 290px;
-
     display: grid;
     place-items: center;
-
     border: none;
     border-radius: 0;
     background: transparent;
     box-shadow: none;
-
     pointer-events: none;
     opacity: 1;
 }
@@ -27,22 +23,18 @@
 
 .hero-art-background {
     position: absolute;
-
     width: 215px;
     height: 215px;
-
     border-radius: 50%;
-    background: #f0e7f9;
-    border: 1px solid #dfccec;
-
-    box-shadow: 0 15px 35px rgba(117, 64, 197, .08);
+    background: #fbf0d1;
+    border: 1px solid #eddaa8;
+    box-shadow: 0 15px 35px rgba(150, 111, 35, .08);
 }
 
 body[data-theme="dark"] .hero-art-background {
-    background: #30233f;
-    border-color: #59426e;
+    background: #352d20;
+    border-color: #62512e;
 }
-
 
 /* ORBIT DETAILS */
 
@@ -55,51 +47,42 @@ body[data-theme="dark"] .hero-art-background {
 }
 
 .hero-orbit-one {
-    border-color: rgba(117, 64, 197, .55);
+    border-color: rgba(166, 124, 43, .55);
     transform: rotate(-32deg);
 }
 
 .hero-orbit-two {
     width: 225px;
     height: 145px;
-    border-color: rgba(223, 85, 152, .55);
+    border-color: rgba(216, 177, 91, .7);
     transform: rotate(38deg);
 }
-
 
 /* PROCESSOR CARD */
 
 .hero-chip-card {
     position: relative;
     z-index: 2;
-
     width: 155px;
     height: 155px;
-
     display: grid;
     place-items: center;
-
-    border: 1px solid #dfc9ef;
+    border: 1px solid #eddaa8;
     border-radius: 25px;
-
-    background: #fffafd;
-
+    background: #fffdf6;
     box-shadow:
-        0 15px 35px rgba(117, 64, 197, .13),
-        0 5px 14px rgba(223, 85, 152, .08);
-
+        0 15px 35px rgba(150, 111, 35, .13),
+        0 5px 14px rgba(216, 177, 91, .12);
     transform: rotate(-4deg);
-
     animation: heroChipFloat 4s ease-in-out infinite;
 }
 
 body[data-theme="dark"] .hero-chip-card {
-    background: #382844;
-    border-color: #76518f;
-
+    background: #3d3323;
+    border-color: #80683a;
     box-shadow:
         0 15px 35px rgba(0, 0, 0, .25),
-        0 0 18px rgba(173, 128, 237, .1);
+        0 0 18px rgba(224, 190, 111, .1);
 }
 
 .hero-chip-svg {
@@ -108,89 +91,78 @@ body[data-theme="dark"] .hero-chip-card {
     height: 125px;
 }
 
-
 /* SMALL PROCESS LABELS */
 
 .hero-process-label {
     position: absolute;
     z-index: 3;
-
     padding: 7px 13px;
-
     border-radius: 7px;
     border: 1px solid;
-
     font-family: 'Space Grotesk', sans-serif;
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 1px;
-
-    box-shadow: 0 5px 15px rgba(72, 39, 105, .08);
+    box-shadow: 0 5px 15px rgba(100, 78, 37, .08);
 }
 
 .hero-process-one {
     top: 45px;
     left: 17px;
-
-    color: #6840ad;
-    background: #eee2fa;
-    border-color: #d8c0ed;
+    color: #8b6729;
+    background: #f8ebc9;
+    border-color: #ead6a3;
 }
 
 .hero-process-two {
     top: 55px;
     right: 8px;
-
-    color: #b93678;
-    background: #fbe3ef;
-    border-color: #f0c3dc;
+    color: #9b7430;
+    background: #fff2d0;
+    border-color: #eed9a5;
 }
 
 .hero-process-three {
     bottom: 46px;
     right: 16px;
-
-    color: #6840ad;
-    background: #eee2fa;
-    border-color: #d8c0ed;
+    color: #8b6729;
+    background: #f8ebc9;
+    border-color: #ead6a3;
 }
 
 body[data-theme="dark"] .hero-process-one,
 body[data-theme="dark"] .hero-process-three {
-    color: #e1c8ff;
-    background: #49345f;
-    border-color: #674a80;
+    color: #f4dfa9;
+    background: #514126;
+    border-color: #79623a;
 }
 
 body[data-theme="dark"] .hero-process-two {
-    color: #ffc1df;
-    background: #563048;
-    border-color: #79405f;
+    color: #f7e5bd;
+    background: #58472b;
+    border-color: #80683b;
 }
-
 
 /* SMALL DOTS */
 
 .hero-decoration-dot {
     position: absolute;
     z-index: 2;
-
     width: 9px;
     height: 9px;
-
     border-radius: 50%;
 }
 
 .dot-one {
     top: 33px;
     right: 69px;
-    background: #df5598;
+    background: #d6b15f;
 }
 
 .dot-two {
     bottom: 57px;
     left: 37px;
-    background: #7540c5;
+    background: #a98236;
 }
 
 .dot-three {
@@ -198,9 +170,8 @@ body[data-theme="dark"] .hero-process-two {
     right: 1px;
     width: 6px;
     height: 6px;
-    background: #df5598;
+    background: #d6b15f;
 }
-
 
 /* CAPTION */
 
@@ -209,13 +180,10 @@ body[data-theme="dark"] .hero-process-two {
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-
     width: max-content;
-
     display: flex;
     align-items: center;
     gap: 9px;
-
     color: var(--purple);
     font-family: 'Space Grotesk', sans-serif;
     font-size: 9px;
@@ -229,34 +197,24 @@ body[data-theme="dark"] .hero-process-two {
     background: var(--pink);
 }
 
-
-/* =========================================
-   LOADING SCREEN PROCESSOR LOGO
-========================================= */
+/* LOADING SCREEN */
 
 .loading-core {
     width: 105px;
     height: 105px;
-
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 2px;
-
     border: 2px solid var(--pink);
     border-radius: 23px;
-
     background: var(--purple);
-
     box-shadow:
-        0 12px 35px rgba(117, 64, 197, .3),
-        0 0 20px rgba(223, 85, 152, .12);
-
+        0 12px 35px rgba(150, 111, 35, .3),
+        0 0 20px rgba(216, 177, 91, .14);
     animation: loadingCpuFloat 2s ease-in-out infinite;
 }
-
-/* SVG LOGO */
 
 .loading-chip-svg {
     width: 55px;
@@ -266,16 +224,12 @@ body[data-theme="dark"] .hero-process-two {
 
 .loading-core .loading-core-label {
     display: block;
-
     color: white;
-
     font-family: 'Space Grotesk', sans-serif;
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 2px;
 }
-
-/* MATCH THE ORBITS TO THE MAIN PALETTE */
 
 .orbit-a {
     border-top-color: var(--pink);
@@ -287,40 +241,22 @@ body[data-theme="dark"] .hero-process-two {
     border-right-color: var(--pink);
 }
 
-/* PROGRESS BAR */
-
 .loading-progress-bar {
-    background: linear-gradient(
-        90deg,
-        var(--purple),
-        var(--pink),
-        var(--purple)
-    );
+    background: linear-gradient(90deg, var(--purple), var(--pink), var(--purple));
 }
 
 .loading-status {
     color: var(--pink-dark);
 }
 
-
-/* =========================================
-   ANIMATION
-========================================= */
+/* ANIMATION */
 
 @keyframes heroChipFloat {
-    0%, 100% {
-        transform: translateY(0) rotate(-4deg);
-    }
-
-    50% {
-        transform: translateY(-7px) rotate(-2deg);
-    }
+    0%, 100% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-7px) rotate(-2deg); }
 }
 
-
-/* =========================================
-   RESPONSIVE
-========================================= */
+/* RESPONSIVE */
 
 @media (max-width: 800px) {
     .welcome-decoration {
@@ -366,9 +302,7 @@ body[data-theme="dark"] .hero-process-two {
 }
 
 @media (max-width: 550px) {
-    .welcome-decoration {
-        display: none;
-    }
+    .welcome-decoration { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
