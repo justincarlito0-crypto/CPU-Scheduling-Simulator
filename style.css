@@ -566,7 +566,7 @@ a {
 
     background: var(--purple);
 
-    box-shadow: 0 12px 28px rgba(117, 64, 197, .25);
+    box-shadow: 0 12px 28px rgba(128, 98, 38, .18);
 
     animation: chipFloat 3s ease-in-out infinite;
 
@@ -747,7 +747,7 @@ a {
 
 body[data-theme="dark"] .algorithm-card:nth-child(3) {
 
-    background: #49345f;
+    background: var(--purple-light);
 
 }
 
@@ -962,11 +962,11 @@ body[data-theme="dark"] .algorithm-card:nth-child(3) {
 
 body[data-theme="dark"] .algorithm-tag {
 
-    color: #e4cbff;
+    color: #f4dfa9;
 
-    background: #49345f;
+    background: var(--purple-light);
 
-    border-color: #63457f;
+    border-color: var(--border);
 
 }
 
@@ -1116,7 +1116,7 @@ body[data-theme="dark"] .algorithm-tag {
 
     border-color: var(--pink);
 
-    box-shadow: 0 0 0 3px rgba(223, 85, 152, .13);
+    box-shadow: 0 0 0 3px rgba(214, 173, 84, .18);
 
 }
 
@@ -1254,7 +1254,7 @@ tbody tr:nth-child(even) {
 
 body[data-theme="dark"] tbody tr:nth-child(even) {
 
-    background: #302237;
+    background: var(--pink-pale);
 
 }
 
@@ -1434,7 +1434,7 @@ tbody tr:hover {
 
 body[data-theme="dark"] .stat-card:nth-child(3) {
 
-    background: #49345f;
+    background: var(--purple-light);
 
 }
 
@@ -1478,7 +1478,7 @@ body[data-theme="dark"] .stat-card:nth-child(3) {
 
 body[data-theme="dark"] .stat-card strong {
 
-    color: #d4baff;
+    color: #f4dfa9;
 
 }
 
@@ -1486,7 +1486,7 @@ body[data-theme="dark"] .stat-card strong {
 
 body[data-theme="dark"] .stat-card:nth-child(2) strong {
 
-    color: #ffb5d6;
+    color: #f7e2b4;
 
 }
 
@@ -1626,7 +1626,7 @@ body[data-theme="dark"] .stat-card:nth-child(2) strong {
 
 
 
-/* PURPLE AND PINK PROCESS COLORS */
+/* PASTEL GOLD PROCESS COLORS */
 
 
 
@@ -1860,9 +1860,9 @@ body[data-theme="dark"] .gantt-time {
 
 body[data-theme="dark"] .result-completion {
 
-    color: #dfc8ff;
+    color: #f6dfaa;
 
-    background: #493363;
+    background: #574627;
 
 }
 
@@ -1870,9 +1870,9 @@ body[data-theme="dark"] .result-completion {
 
 body[data-theme="dark"] .result-turnaround {
 
-    color: #ffb7d8;
+    color: #f7e2b4;
 
-    background: #593047;
+    background: #5a4828;
 
 }
 
@@ -1880,9 +1880,9 @@ body[data-theme="dark"] .result-turnaround {
 
 body[data-theme="dark"] .result-waiting {
 
-    color: #d8bdff;
+    color: #f2d99e;
 
-    background: #46315e;
+    background: #4e4026;
 
 }
 
@@ -1930,7 +1930,7 @@ body[data-theme="dark"] .result-waiting {
 
     padding: 20px;
 
-    background: rgba(15, 10, 23, .55);
+    background: rgba(20, 17, 11, .60);
 
     backdrop-filter: blur(5px);
 
@@ -2112,7 +2112,7 @@ body[data-theme="dark"] .result-waiting {
 
     padding: 20px;
 
-    background: rgba(15, 10, 23, .55);
+    background: rgba(20, 17, 11, .60);
 
     backdrop-filter: blur(5px);
 
